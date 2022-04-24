@@ -9,7 +9,7 @@ If you find any bug or not working function you can contact me.
  *  @date   : 2022/03/23
  *  @author : Abdul Moez
  *  @Study  : UnderGraduate in GCU Lahore, Pakistan
- *  @repos  :(https://github.com/Anonym0usWork/android-memorytool)
+ *  @repos  :(https://github.com/Anonym0usWork1221/android-memorytool)
  MIT License
 
  Copyright (c) 2022 AbdulMoez
