@@ -240,10 +240,12 @@ print(values1)
 
 
 ```
-#Contributor
+# Contributor
+
 <a href = "https://github.com/Anonym0usWork1221/android-memorytool/graphs/contributors">
   <img src = "https://contrib.rocks/image?repo=Anonym0usWork1221/android-memorytool"/>
 </a>
+
 
 Assistance
 ----------
