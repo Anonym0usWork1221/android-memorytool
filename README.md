@@ -7,7 +7,7 @@ AndroidMemoryTool
 [![Python](https://img.shields.io/badge/language-Python%203-blue.svg)](https://www.python.org)
 [![GPT_LICENSE](https://img.shields.io/badge/license-GPL-red.svg)](https://opensource.org/licenses/)
 
-====
+-----------
 
 
 AndroidMemoryTool is a memory reader and writer tool designed for android and linux os's 
