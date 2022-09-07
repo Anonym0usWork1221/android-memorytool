@@ -1,5 +1,18 @@
 AndroidMemoryTool
 ====
+[![GitHub stars](https://img.shields.io/github/stars/Anonym0usWork1221/android-memorytool.svg)](https://github.com/Anonym0usWork1221/android-memorytool/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/Anonym0usWork1221/android-memorytool.svg)](https://github.com/Anonym0usWork1221/android-memorytool/network/members)
+[![GitHub issues](https://img.shields.io/github/issues/Anonym0usWork1221/android-memorytool.svg)](https://github.com/Anonym0usWork1221/android-memorytool/issues)
+[![GitHub watchers](https://img.shields.io/github/watchers/Anonym0usWork1221/android-memorytool.svg)](https://github.com/Anonym0usWork1221/android-memorytool/watchers)
+[![Python](https://img.shields.io/badge/language-Python%203-blue.svg)](https://www.python.org)
+[![Bash](https://img.shields.io/badge/language-Python-blue.svg)](https://www.gnu.org/software/bash/)
+[![MIT](https://img.shields.io/badge/license-GPL-red.svg)](https://opensource.org/licenses/)
+
+[![ForTheBadge built-by-developers](http://ForTheBadge.com/images/badges/built-by-developers.svg)](https://github.com/Gameye98)  
+
+[![BlackHole Security](assets/gitbhs.svg)](https://github.com/BlackHoleSecurity)
+
+====
 
 
 AndroidMemoryTool is a memory reader and writer tool designed for android and linux os's 
