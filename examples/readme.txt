@@ -1,1 +1,1 @@
-This module is comatiable with both linux and android systems
+This module is comptiable with both linux and android systems
