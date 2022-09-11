@@ -73,7 +73,7 @@ pid = androidMemoryTool.get_pid("com.jaratools.org")
 Next steps are sath for both os's
 
 ```py
-values_replaced = AndroidMemoryTool.write_dword_all(pid, 23, 100)
+values_replaced = androidMemoryTool.write_dword_all(pid, 23, 100)
 
 print(values_replaced)
 ```
@@ -96,8 +96,8 @@ import androidMemoryTool
 from androidMemoryTool import AndroidMemoryTool
 
 pid = androidMemoryTool.get_pid("com.somegame.org")
-base_addr = AndroidMemoryTool.get_module_base_address(pid, "libUE4.so")
-read = AndroidMemoryTool.read_lib_offsets_DOUBLE(pid, base_addr, 0xfff)
+base_addr = androidMemoryTool.get_module_base_address(pid, "libUE4.so")
+read = androidMemoryTool.read_lib_offsets_DOUBLE(pid, base_addr, 0xfff)
 print(read)
 ```
 
@@ -107,8 +107,8 @@ import androidMemoryTool
 from androidMemoryTool import AndroidMemoryTool
 
 pid = androidMemoryTool.get_pid("com.somegame.org")
-base_addr = AndroidMemoryTool.get_module_base_address(pid, "libUE4.so")
-AndroidMemoryTool.write_lib_offsets_DOUBLE(pid, base_addr, 0xfff, 23)
+base_addr = androidMemoryTool.get_module_base_address(pid, "libUE4.so")
+androidMemoryTool.write_lib_offsets_DOUBLE(pid, base_addr, 0xfff, 23)
 
 ```
 
