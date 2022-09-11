@@ -65,7 +65,6 @@ pid = androidMemoryTool.get_pid("ac_client")
 For Android os use packagename of target application
 ```py
 import androidMemoryTool
-from androidMemoryTool import AndroidMemoryTool
 pid = androidMemoryTool.get_pid("com.jaratools.org")
 ```
 
@@ -82,18 +81,14 @@ print(values_replaced)
 
 ```py
 import androidMemoryTool
-from androidMemoryTool import AndroidMemoryTool
 pid = androidMemoryTool.get_pid("ac_client")
-
-offsets, total_values_found = AndroidMemoryTool.read_xor_all(pid, 23)
-
+offsets, total_values_found = androidMemoryTool.read_xor_all(pid, 23)
 print(offsets[0], total_values_found)
 ```
 
 4. Read direct lib offsets
 ```py
 import androidMemoryTool
-from androidMemoryTool import AndroidMemoryTool
 
 pid = androidMemoryTool.get_pid("com.somegame.org")
 base_addr = androidMemoryTool.get_module_base_address(pid, "libUE4.so")
@@ -104,7 +99,6 @@ print(read)
 4. Write direct lib offsets
 ```py
 import androidMemoryTool
-from androidMemoryTool import AndroidMemoryTool
 
 pid = androidMemoryTool.get_pid("com.somegame.org")
 base_addr = androidMemoryTool.get_module_base_address(pid, "libUE4.so")
