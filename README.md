@@ -50,7 +50,7 @@ Project live at
 ```https://pypi.org/project/androidMemoryTool/0.2/```
 
 
-Memory Tool with some examples which can be found in the `examples` folder.
+Memory Tool with example which can be found in the `Android-Py-Cheats-Script @ 9d2520e` sub folder.
 
 ## Usage
 1. import the module and grab process id of target process.
