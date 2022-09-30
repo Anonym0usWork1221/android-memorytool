@@ -14,107 +14,151 @@ AndroidMemoryTool is a memory reader and writer tool designed for android and li
 .This Tool is written in python using ctypes not affective as c.
 If you find any bug or not working function you can contact me. 
 
- *  @date   : 2022/03/23
- *  @author : Abdul Moez
- *  @Study  : UnderGraduate in GCU Lahore, Pakistan
- *  @repos  :(https://github.com/Anonym0usWork1221/android-memorytool)
+ *  date   : 2022/03/23
+ *  author : **__Abdul Moez__**
+ *  Version : 0.3
+ *  Study  : UnderGraduate in GCU Lahore, Pakistan
+ *  repo  : https://github.com/Anonym0usWork1221/android-memorytool
  
  GNU General Public License
 
  Copyright (c) 2022 AbdulMoez
 
- The GNU General Public License is a free, copyleft license for software and other kinds of works.
+# Note
+    1. This documentation is only for 0.3 version
+    2. You can find old version on pypi if you want to use it
+    3. This version is totally different from old
 
-The licenses for most software and other practical works are designed to take away your freedom to share and change the works. By contrast, the GNU General Public License is intended to guarantee your freedom to share and change all versions of a program--to make sure it remains free software for all its users. We, the Free Software Foundation, use the GNU General Public License for most of our software; it applies also to any other work released this way by its authors. You can apply it to your programs, too.
-
+# Version 3.0
+    1. Removed complexity to use tool
+    2. Implemented Oop Structures
+    3. Added new data types for libs direct read/write
+    4. Added raw dump support
+    5. Fixed the bugs
+    6. Fixed Search and Reading returnig offset issues
+    7. Added Refiners inorder to check the changed in old values
+    
 
 Requirments
 -----------
-No additional libraries need this tool is made with python built-in libraries
 
-* Needed python version 3.x
+* Python 3.x
 
 * Android Requirments -> Rooted Device Needed
 
-Installation, Documentation and Examples
+Installation
 ----------------------------------------
-Simply install it by pip and use it in your project
+    Simply install it by pip and use it in your project
+        pip install androidMemoryTool==0.3
 
-```pip install androidMemoryTool==0.2```
+    Or by cloning and then run command
+        pip install .
 
-or by cloning and then run command
-
-``` pip install .```
-
-Project live at 
-```https://pypi.org/project/androidMemoryTool/0.2/```
+    Project live at   
+        https://pypi.org/project/androidMemoryTool/0.3/
 
 
 Memory Tool with example which can be found in the `Android-Py-Cheats-Script @ 9d2520e` sub folder.
 
-## Usage
-1. import the module and grab process id of target process.
+## Documentation  
 
-For Linux os
-```py
-import androidMemoryTool
-from androidMemoryTool import AndroidMemoryTool
-pid = androidMemoryTool.get_pid("ac_client")
-```
+* Getting Process ID
 
-For Android os use packagename of target application
-```py
-import androidMemoryTool
-pid = androidMemoryTool.get_pid("com.jaratools.org")
-```
+    ```py
+    from androidMemoryTool import AndroidMemoryTool
+    tool = AndroidMemoryTool.get_pid('ac_client') # for android use package name e.g(com.app.org)
+    print(tool)
 
-2. After getting PID we are ready to read or write target process memory
-Next steps are sath for both os's
+    ```
+* Getting Module Base
 
-```py
-values_replaced = androidMemoryTool.write_dword_all(pid, 23, 100)
+    ```py
+    from androidMemoryTool import AndroidMemoryTool
+    pid = AndroidMemoryTool.get_pid('ac_client')
+    base_addr = AndroidMemoryTool.get_module_base_address(pid, "client.so")
+    print(base_addr)
 
-print(values_replaced)
-```
+    ```
 
-3. Read process memory
+* Searching and Read process memory
 
-```py
-import androidMemoryTool
-pid = androidMemoryTool.get_pid("ac_client")
-offsets, total_values_found = androidMemoryTool.read_xor_all(pid, 23)
-print(offsets[0], total_values_found)
-```
+    ```py
+    from androidMemoryTool import AndroidMemoryTool
 
-4. Read direct lib offsets
-```py
-import androidMemoryTool
+    # initialize tool
+    tool = AndroidMemoryTool(PKG="ac_client", TYPE=AndroidMemoryTool.DataTypes.DWORD, SPEED_MODE=False, WORKERS=55,
+                            pMAP=AndroidMemoryTool.PMAP(ALL=True))
+    values = tool.read_value(100)
+    founded_offsets = values[0]
+    founded_values = values[1]
+    print(founded_values)
+    print(founded_offsets)
+    ```
 
-pid = androidMemoryTool.get_pid("com.somegame.org")
-base_addr = androidMemoryTool.get_module_base_address(pid, "libUE4.so")
-read = androidMemoryTool.read_lib_offsets_DOUBLE(pid, base_addr, 0xfff)
-print(read)
-```
+* Search and Write process memory
 
-4. Write direct lib offsets
-```py
-import androidMemoryTool
+    ```py
+    from androidMemoryTool import AndroidMemoryTool
 
-pid = androidMemoryTool.get_pid("com.somegame.org")
-base_addr = androidMemoryTool.get_module_base_address(pid, "libUE4.so")
-androidMemoryTool.write_lib_offsets_DOUBLE(pid, base_addr, 0xfff, 23)
+    # initialize tool
+    tool = AndroidMemoryTool(PKG="ac_client", TYPE=AndroidMemoryTool.DataTypes.DWORD, SPEED_MODE=False, WORKERS=55,
+                            pMAP=AndroidMemoryTool.PMAP(ALL=True))
 
-```
+    values1 = tool.read_write_value(100, 10)
+    print(values1)
+    ```
 
-this will find all the values realated to your search and replace them with replaced value
-and return the number of values it changed
+* Read address value
+    ```py
+    from androidMemoryTool import AndroidMemoryTool
+    pid = AndroidMemoryTool.get_pid('ac_client')
+    base_addr = AndroidMemoryTool.get_module_base_address(pid, "client.so")
+    tool = AndroidMemoryTool(PKG="ac_client", TYPE=AndroidMemoryTool.DataTypes.DWORD)
+    values1 = tool.read_lib(base_addr, 0xfff150d)
+    print(values1)
+
+    ```
+
+* Write address value
+    ```py
+    from androidMemoryTool import AndroidMemoryTool
+    pid = AndroidMemoryTool.get_pid('ac_client')
+    base_addr = AndroidMemoryTool.get_module_base_address(pid, "client.so")
+    tool = AndroidMemoryTool(PKG="ac_client", TYPE=AndroidMemoryTool.DataTypes.DWORD)
+    values1 = tool.write_lib(base_addr, 0xfff150d, 58)
+    print(values1)
+
+    ```
+
+* Raw Dump Process memory 
+    ```py
+    from androidMemoryTool import AndroidMemoryTool
+    tool = AndroidMemoryTool(PKG="ac_client")
+    dump = tool.raw_dump(lib_name='client.so', path='/home/kali/Documents/')
+    print(dump) # True or False
+
+    ```
+
+* Address Refiner 
+    ```py
+    from androidMemoryTool import AndroidMemoryTool
+    tool = AndroidMemoryTool(PKG="ac_client", TYPE=AndroidMemoryTool.DataTypes.DWORD, SPEED_MODE=False, WORKERS=55,
+                         pMAP=AndroidMemoryTool.PMAP(ALL=True))
+    values = tool.read_value(100)
+    founded_offsets = values[0]
+    refined_address = tool.refiner_address(list_address=founded_offsets, value_to_refine=50)
+    print(refined_address)
+
+    ```
+
 
 # Video Demonstration
 [![usage](https://img.youtube.com/vi/vebE1Rf1ogo/0.jpg)](https://www.youtube.com/watch?v=vebE1Rf1ogo)
 
 
-Supported Data Types before update
+Supported Data Types For read/write 0.3
 -------------------
+
 All data types are signed.
 
 | **Range** | **Name** |  **Ctype** |
@@ -129,119 +173,42 @@ All data types are signed.
 | Random | UTF-8 | Text
 | Random | UTF-16LE | Text
 
-Supported Map Ranges
---------------------
-| **Short Name** | **Name** |  **Description** |
+Supported Data Types For libs direct read/write 0.3
+-------------------
+
+All data types are signed.
+
+| **Range** | **Name** |  **Ctype** |
 | ------- | -------- | ------------|
-| CA | C++ alloc | RAM c++ Allocated memory
-| A  | Anonymous | Range with r-w access only
-| XA | Code App  | shared libs memory
-| ALL | Whole Memory | Whole Memory of current process (slow)
+| -2,147,483,648 to 2,147,483,647 | DWORD | signed int 
+| 3.4E +/- 38 (7 digits) | FLOAT | float
+| 1.7E +/- 308 (15 digits) | DOUBLE | double
+| -32,768 to 32,767 | WORD | signed short int
+| -128 to 127 | BYTE | signed char
+| -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807 | QWORD | signed long long
+| -2,147,483,648 to 2,147,483,647 | XOR | signed long
 
 
-
-## Update 0.2
-
-* Expanded Supported Maps Ranges
-
+Supported Map Ranges 0.3
 --------------------
-| **Short Name** | **Name** |  **Description** |
+| **Script Name** | **Name** |  **Description** |
 | ------- | -------- | ------------|
 | ALL | Whole Memory | Whole Memory of current process (slow)
-| CA | C++ alloc | RAM c++ Allocated memory
-| A  | Anonymous | Range with r-w access only
-| Xa | Code App  | shared libs memory (dangerous)
-|Jh|Java Heap| Java heap
-|Ch|C++ Heap| Heap memory of cpp
-|Cd|C++ .data| .Data Memory
-|Cb|C++ .bss| .bss section memory
-|J|Java| Java memory section
-|S|Stack| Stack Memory
-|As|Ashmen| Ashmen Memory
-|V|Video| Video memory range 
+| C_ALLOC | C++ alloc | RAM c++ Allocated memory
+| A_ANONYMOUS  | Anonymous | Range with r-w access only
+| CODE_APP | Code App  | shared libs memory (dangerous)
+|JAVA_HEAP|Java Heap| Java heap
+|C_HEAP|C++ Heap| Heap memory of cpp
+|C_DATA|C++ .data| .Data Memory
+|C_BSS|C++ .bss| .bss section memory
+|J_Java| Java |Java memory section
+|STACK|Stack| Stack Memory
+|ASHMEM|Ashmen| Ashmen Memory
+|V_video|Video| Video memory range 
 |B_Bad|Bad| Bad Memory (dangerous)
-|Xs|Code system| Code system memory (dangerous)
-
-* Improved old mapping methods
-* Added Structures in order to work easy
-* Fixed crashing on UTF-8 and UTF-16 DataTypes
-* Set mapping address to r-w permissions only to avoid I/O errors
-* For Linux only use ALL memory range
-* Improved Speed
-* Added Support of multiple maps Ranges
-* Fixed utf data types (values were not changing)
-* Added data classes for fast search methods
-* Changed License To GNU Public
-* Added Fast Search algorithms
-* Added Workers support in order to increase cpu speed up searches
-* Fixed xrash on termux
-* Created package
-
-* UPDATED Usage
-For Linux os
-```py
-from androidMemoryTool import AndroidMemoryTool
-import androidMemoryTool
-# initialize tool
-
-androidMemoryTool.SettingUpTool().init_setup(PKG="ac_client", TYPE=androidMemoryTool.DataTypes.DWORD,
-                                             SPEED_MODE=True, WORKERS=55)
-
-# set True to maps you want to use
-androidMemoryTool.InitMemoryTool().init_tool(pMAP=androidMemoryTool.PMAP(ALL=True, C_ALLOC=True, C_DATA=False
-                                                                         , C_HEAP=False, CODE_APP=False, C_BSS=False
-                                                                         , JAVA_HEAP=False, J_Java=False, CODE_SYSTEM=False
-                                                                         , A_ANONYMOUS=False, ASHMEM=False, STACK=False
-                                                                         , B_BAD=False))
+|CODE_SYSTEM|Code system| Code system memory (dangerous)
 
 
-# if you are reading you will get tuple of two values offset list and total values found
-
-values = AndroidMemoryTool.read_value(100)
-
-founded_offsets = values[0]
-founded_values = values[1]
-print(founded_offsets)
-
-# if you are writing only return total value wrote
-
-values1 = AndroidMemoryTool.read_write_value(100, 10)
-print(values1)
-
-```
-
-For Android
-```py
-from androidMemoryTool import AndroidMemoryTool
-import androidMemoryTool
-# initialize tool
-
-androidMemoryTool.SettingUpTool().init_setup(PKG="jaradevlopers.site", TYPE=androidMemoryTool.DataTypes.DWORD,
-                                             SPEED_MODE=True, WORKERS=55)
-
-# set True to maps you want to use
-androidMemoryTool.InitMemoryTool().init_tool(pMAP=androidMemoryTool.PMAP(ALL=True, C_ALLOC=True, C_DATA=False
-                                                                         , C_HEAP=False, CODE_APP=False, C_BSS=False
-                                                                         , JAVA_HEAP=False, J_Java=False, CODE_SYSTEM=False
-                                                                         , A_ANONYMOUS=False, ASHMEM=False, STACK=False
-                                                                         , B_BAD=False))
-
-
-# if you are reading you will get tuple of two values offset list and total values found
-
-values = AndroidMemoryTool.read_value(100)
-
-founded_offsets = values[0]
-founded_values = values[1]
-print(founded_offsets)
-
-# if you are writing only return total value wrote
-
-values1 = AndroidMemoryTool.read_write_value(100, 10)
-print(values1)
-
-
-```
 # Contributor
 
 <a href = "https://github.com/Anonym0usWork1221/android-memorytool/graphs/contributors">
