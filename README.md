@@ -29,7 +29,7 @@ If you find any bug or not working function you can contact me.
     2. You can find old version on pypi if you want to use it
     3. This version is totally different from old
 
-# Version 3.0
+# Version 0.3
     1. Removed complexity to use tool
     2. Implemented Oop Structures
     3. Added new data types for libs direct read/write
