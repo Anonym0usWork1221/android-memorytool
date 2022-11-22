@@ -1,6 +1,6 @@
 """
  *  date   : 2022/03/23
- *  Version : 0.3
+ *  Version : 0.4
  *  author : Abdul Moez (abdulmoez123456789@gmail.com)
  *  Study  : UnderGraduate in GCU Lahore, Pakistan
  *  https://github.com/Anonym0usWork1221/android-memorytool
@@ -26,6 +26,9 @@ class SearchAndRead:
 
     def get_readers_values(self) -> list:
         return self._returned_v.get()
+
+    def reset_queue(self) -> None:
+        self._returned_v.queue.clear()
 
     @store_in_queue
     def speed_search_and_read_text(self, pid: str, address_list: list, read: any) -> tuple[list[str], int]:

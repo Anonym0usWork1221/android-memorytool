@@ -1,6 +1,6 @@
 """
  *  date   : 2022/03/23
- *  Version : 0.3
+ *  Version : 0.4
  *  author : Abdul Moez (abdulmoez123456789@gmail.com)
  *  Study  : UnderGraduate in GCU Lahore, Pakistan
  *  https://github.com/Anonym0usWork1221/android-memorytool

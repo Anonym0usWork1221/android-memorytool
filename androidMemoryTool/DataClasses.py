@@ -1,15 +1,16 @@
 """
  *  date   : 2022/03/23
- *  Version : 0.3
+ *  Version : 0.4
  *  author : Abdul Moez (abdulmoez123456789@gmail.com)
  *  Study  : UnderGraduate in GCU Lahore, Pakistan
  *  https://github.com/Anonym0usWork1221/android-memorytool
 
 """
 
-import struct
-import sys
-import os
+from struct import pack, unpack
+from sys import byteorder
+from os import popen
+from binascii import unhexlify
 from dataclasses import dataclass
 from .mapping import Mapping
 
@@ -57,21 +58,37 @@ class DataClasses:
         pass
 
     @staticmethod
-    def get_pid(pkg: str) -> str:
+    def get_pid(pkg: any((str, int))) -> str:
         pid_id = None
+        if isinstance(pkg, int):
+            pkg = str(pkg)
+            pid_id = popen(f"ps -q {pkg} -o cmd=")
+            if pid_id.read() is None:
+                return ""
+            return str(pkg)
+
+        if pkg.isnumeric():
+            pkg = str(pkg)
+            pid_id = popen(f"ps -q {pkg} -o cmd=")
+            if pid_id.read() is None:
+                return ""
+            return str(pkg)
+
         try:
-            pid_id = os.popen("pidof {}".format(pkg))
+            pid_id = popen("pidof {}".format(pkg))
         except Exception as e:
             print("[*]Exception ", e)
 
         pid_decode = pid_id.read()
         if pid_decode is not None:
-            _PID = pid_decode.replace("\n", "")
-            return str(_PID)
+            process_id = pid_decode.replace("\n", "").split(" ")
+            if len(process_id) > 1:
+                print("[*] Multiple PIDS found using first PID: %s" % process_id[0])
+            return str(process_id[0])
         else:
             return ""
 
-    def init_setup(self, PKG: str, TYPE=DataTypes.DWORD, SPEED_MODE=False, WORKERS=55) -> None:
+    def init_setup(self, PKG: any((str, int)), TYPE=DataTypes.DWORD, SPEED_MODE=False, WORKERS=55) -> None:
         self._DATA_TYPES = TYPE
         self._PKG_NAME = PKG
         self._IS_SPEED_MODE = SPEED_MODE
@@ -116,128 +133,155 @@ class DataClasses:
     def data_type_encoding(self, read: any, write=None) -> any:
         if self._DATA_TYPES == "DWORD":
             if write:
-                if sys.byteorder == 'little':
-                    search_value = struct.pack('<i', read)
-                    replace_value = struct.pack('<i', write)
+                if "h" in str(read).lower():
+                    read = int(str(read).lower().replace("h", ""), 16)
+                if "h" in str(write).lower():
+                    write = int(str(write).lower().replace("h", ""), 16)
+
+                if byteorder == 'little':
+                    search_value = pack('<i', read)
+                    replace_value = pack('<i', write)
                 else:
-                    search_value = struct.pack('>i', read)
-                    replace_value = struct.pack('>i', write)
+                    search_value = pack('>i', read)
+                    replace_value = pack('>i', write)
 
                 return search_value, replace_value
 
             else:
-                if sys.byteorder == 'little':
-                    search_value = struct.pack('<i', read)
+                if "h" in str(read).lower():
+                    read = int(str(read).lower().replace("h", ""), 16)
+
+                if byteorder == 'little':
+                    search_value = pack('<i', read)
                 else:
-                    search_value = struct.pack('>i', read)
+                    search_value = pack('>i', read)
                 return search_value
 
         elif self._DATA_TYPES == "FLOAT":
             if write:
-                if sys.byteorder == 'little':
-                    search_value = struct.pack('<f', read)
-                    replace_value = struct.pack('<f', write)
+                if "h" in str(read).lower():
+                    read = unpack('!f', bytes.fromhex(str(read).lower().replace("h", "")))[0]
+
+                if "h" in str(write).lower():
+                    write = unpack('!f', bytes.fromhex(str(write).lower().replace("h", "")))[0]
+
+                if byteorder == 'little':
+                    search_value = pack('<f', read)
+                    replace_value = pack('<f', write)
                 else:
-                    search_value = struct.pack('>f', read)
-                    replace_value = struct.pack('>f', write)
+                    search_value = pack('>f', read)
+                    replace_value = pack('>f', write)
 
                 return search_value, replace_value
 
             else:
-                if sys.byteorder == 'little':
-                    search_value = struct.pack('<f', read)
+                if "h" in str(read).lower():
+                    read = unpack('!f', bytes.fromhex(str(read).lower().replace("h", "")))[0]
+
+                if byteorder == 'little':
+                    search_value = pack('<f', read)
                 else:
-                    search_value = struct.pack('>f', read)
+                    search_value = pack('>f', read)
                 return search_value
 
         elif self._DATA_TYPES == "DOUBLE":
             if write:
-                if sys.byteorder == 'little':
-                    search_value = struct.pack('<d', read)
-                    replace_value = struct.pack('<d', write)
+                if "h" in str(read).lower():
+                    read = unpack('d', unhexlify(str(read).lower().replace("h", "")))[0]
+
+                if "h" in str(write).lower():
+                    write = unpack('d', unhexlify(str(write).lower().replace("h", "")))[0]
+
+                if byteorder == 'little':
+                    search_value = pack('<d', read)
+                    replace_value = pack('<d', write)
                 else:
-                    search_value = struct.pack('>d', read)
-                    replace_value = struct.pack('>d', write)
+                    search_value = pack('>d', read)
+                    replace_value = pack('>d', write)
 
                 return search_value, replace_value
 
             else:
-                if sys.byteorder == 'little':
-                    search_value = struct.pack('<d', read)
+                if "h" in str(read).lower():
+                    read = unpack('d', unhexlify(str(read).lower().replace("h", "")))[0]
+
+                if byteorder == 'little':
+                    search_value = pack('<d', read)
                 else:
-                    search_value = struct.pack('>d', read)
+                    search_value = pack('>d', read)
                 return search_value
 
         elif self._DATA_TYPES == "WORD":
             if write:
-                if sys.byteorder == 'little':
-                    search_value = struct.pack('<h', read)
-                    replace_value = struct.pack('<h', write)
+
+                if byteorder == 'little':
+                    search_value = pack('<h', read)
+                    replace_value = pack('<h', write)
                 else:
-                    search_value = struct.pack('>h', read)
-                    replace_value = struct.pack('>h', write)
+                    search_value = pack('>h', read)
+                    replace_value = pack('>h', write)
 
                 return search_value, replace_value
 
             else:
-                if sys.byteorder == 'little':
-                    search_value = struct.pack('<i', read)
+                if byteorder == 'little':
+                    search_value = pack('<i', read)
                 else:
-                    search_value = struct.pack('>i', read)
+                    search_value = pack('>i', read)
                 return search_value
 
         elif self._DATA_TYPES == "BYTE":
             if write:
-                if sys.byteorder == 'little':
-                    search_value = struct.pack('<b', read)
-                    replace_value = struct.pack('<b', write)
+                if byteorder == 'little':
+                    search_value = pack('<b', read)
+                    replace_value = pack('<b', write)
                 else:
-                    search_value = struct.pack('>b', read)
-                    replace_value = struct.pack('>b', write)
+                    search_value = pack('>b', read)
+                    replace_value = pack('>b', write)
 
                 return search_value, replace_value
 
             else:
-                if sys.byteorder == 'little':
-                    search_value = struct.pack('<b', read)
+                if byteorder == 'little':
+                    search_value = pack('<b', read)
                 else:
-                    search_value = struct.pack('>b', read)
+                    search_value = pack('>b', read)
                 return search_value
 
         elif self._DATA_TYPES == "QWORD":
             if write:
-                if sys.byteorder == 'little':
-                    search_value = struct.pack('<q', read)
-                    replace_value = struct.pack('<q', write)
+                if byteorder == 'little':
+                    search_value = pack('<q', read)
+                    replace_value = pack('<q', write)
                 else:
-                    search_value = struct.pack('>q', read)
-                    replace_value = struct.pack('>q', write)
+                    search_value = pack('>q', read)
+                    replace_value = pack('>q', write)
 
                 return search_value, replace_value
 
             else:
-                if sys.byteorder == 'little':
-                    search_value = struct.pack('<q', read)
+                if byteorder == 'little':
+                    search_value = pack('<q', read)
                 else:
-                    search_value = struct.pack('>q', read)
+                    search_value = pack('>q', read)
                 return search_value
 
         elif self._DATA_TYPES == "XOR":
             if write:
-                if sys.byteorder == 'little':
-                    search_value = struct.pack('<l', read)
-                    replace_value = struct.pack('<l', write)
+                if byteorder == 'little':
+                    search_value = pack('<l', read)
+                    replace_value = pack('<l', write)
                 else:
-                    search_value = struct.pack('>l', read)
-                    replace_value = struct.pack('>l', write)
+                    search_value = pack('>l', read)
+                    replace_value = pack('>l', write)
 
                 return search_value, replace_value
 
             else:
-                if sys.byteorder == 'little':
-                    search_value = struct.pack('<l', read)
+                if byteorder == 'little':
+                    search_value = pack('<l', read)
                 else:
-                    search_value = struct.pack('>l', read)
+                    search_value = pack('>l', read)
                 return search_value
 
         elif self._DATA_TYPES == "UTF-8":
@@ -268,128 +312,128 @@ class DataClasses:
     def data_type_decoding(self, read: any, write=None) -> any:
         if self._DATA_TYPES == "DWORD":
             if write:
-                if sys.byteorder == 'little':
-                    search_value = struct.unpack('<i', read)
-                    replace_value = struct.unpack('<i', write)
+                if byteorder == 'little':
+                    search_value = unpack('<i', read)
+                    replace_value = unpack('<i', write)
                 else:
-                    search_value = struct.unpack('>i', read)
-                    replace_value = struct.unpack('>i', write)
+                    search_value = unpack('>i', read)
+                    replace_value = unpack('>i', write)
 
                 return search_value, replace_value
 
             else:
-                if sys.byteorder == 'little':
-                    search_value = struct.unpack('<i', read)
+                if byteorder == 'little':
+                    search_value = unpack('<i', read)
                 else:
-                    search_value = struct.unpack('>i', read)
+                    search_value = unpack('>i', read)
                 return search_value
 
         elif self._DATA_TYPES == "FLOAT":
             if write:
-                if sys.byteorder == 'little':
-                    search_value = struct.unpack('<f', read)
-                    replace_value = struct.unpack('<f', write)
+                if byteorder == 'little':
+                    search_value = unpack('<f', read)
+                    replace_value = unpack('<f', write)
                 else:
-                    search_value = struct.unpack('>f', read)
-                    replace_value = struct.unpack('>f', write)
+                    search_value = unpack('>f', read)
+                    replace_value = unpack('>f', write)
 
                 return search_value, replace_value
 
             else:
-                if sys.byteorder == 'little':
-                    search_value = struct.unpack('<f', read)
+                if byteorder == 'little':
+                    search_value = unpack('<f', read)
                 else:
-                    search_value = struct.unpack('>f', read)
+                    search_value = unpack('>f', read)
                 return search_value
 
         elif self._DATA_TYPES == "DOUBLE":
             if write:
-                if sys.byteorder == 'little':
-                    search_value = struct.unpack('<d', read)
-                    replace_value = struct.unpack('<d', write)
+                if byteorder == 'little':
+                    search_value = unpack('<d', read)
+                    replace_value = unpack('<d', write)
                 else:
-                    search_value = struct.unpack('>d', read)
-                    replace_value = struct.unpack('>d', write)
+                    search_value = unpack('>d', read)
+                    replace_value = unpack('>d', write)
 
                 return search_value, replace_value
 
             else:
-                if sys.byteorder == 'little':
-                    search_value = struct.unpack('<d', read)
+                if byteorder == 'little':
+                    search_value = unpack('<d', read)
                 else:
-                    search_value = struct.unpack('>d', read)
+                    search_value = unpack('>d', read)
                 return search_value
 
         elif self._DATA_TYPES == "WORD":
             if write:
-                if sys.byteorder == 'little':
-                    search_value = struct.unpack('<h', read)
-                    replace_value = struct.unpack('<h', write)
+                if byteorder == 'little':
+                    search_value = unpack('<h', read)
+                    replace_value = unpack('<h', write)
                 else:
-                    search_value = struct.unpack('>h', read)
-                    replace_value = struct.unpack('>h', write)
+                    search_value = unpack('>h', read)
+                    replace_value = unpack('>h', write)
 
                 return search_value, replace_value
 
             else:
-                if sys.byteorder == 'little':
-                    search_value = struct.unpack('<i', read)
+                if byteorder == 'little':
+                    search_value = unpack('<i', read)
                 else:
-                    search_value = struct.unpack('>i', read)
+                    search_value = unpack('>i', read)
                 return search_value
 
         elif self._DATA_TYPES == "BYTE":
             if write:
-                if sys.byteorder == 'little':
-                    search_value = struct.unpack('<b', read)
-                    replace_value = struct.unpack('<b', write)
+                if byteorder == 'little':
+                    search_value = unpack('<b', read)
+                    replace_value = unpack('<b', write)
                 else:
-                    search_value = struct.unpack('>b', read)
-                    replace_value = struct.unpack('>b', write)
+                    search_value = unpack('>b', read)
+                    replace_value = unpack('>b', write)
 
                 return search_value, replace_value
 
             else:
-                if sys.byteorder == 'little':
-                    search_value = struct.unpack('<b', read)
+                if byteorder == 'little':
+                    search_value = unpack('<b', read)
                 else:
-                    search_value = struct.unpack('>b', read)
+                    search_value = unpack('>b', read)
                 return search_value
 
         elif self._DATA_TYPES == "QWORD":
             if write:
-                if sys.byteorder == 'little':
-                    search_value = struct.unpack('<q', read)
-                    replace_value = struct.unpack('<q', write)
+                if byteorder == 'little':
+                    search_value = unpack('<q', read)
+                    replace_value = unpack('<q', write)
                 else:
-                    search_value = struct.unpack('>q', read)
-                    replace_value = struct.unpack('>q', write)
+                    search_value = unpack('>q', read)
+                    replace_value = unpack('>q', write)
 
                 return search_value, replace_value
 
             else:
-                if sys.byteorder == 'little':
-                    search_value = struct.unpack('<q', read)
+                if byteorder == 'little':
+                    search_value = unpack('<q', read)
                 else:
-                    search_value = struct.unpack('>q', read)
+                    search_value = unpack('>q', read)
                 return search_value
 
         elif self._DATA_TYPES == "XOR":
             if write:
-                if sys.byteorder == 'little':
-                    search_value = struct.unpack('<l', read)
-                    replace_value = struct.unpack('<l', write)
+                if byteorder == 'little':
+                    search_value = unpack('<l', read)
+                    replace_value = unpack('<l', write)
                 else:
-                    search_value = struct.unpack('>l', read)
-                    replace_value = struct.unpack('>l', write)
+                    search_value = unpack('>l', read)
+                    replace_value = unpack('>l', write)
 
                 return search_value, replace_value
 
             else:
-                if sys.byteorder == 'little':
-                    search_value = struct.unpack('<l', read)
+                if byteorder == 'little':
+                    search_value = unpack('<l', read)
                 else:
-                    search_value = struct.unpack('>l', read)
+                    search_value = unpack('>l', read)
                 return search_value
 
         elif self._DATA_TYPES == "UTF-8":

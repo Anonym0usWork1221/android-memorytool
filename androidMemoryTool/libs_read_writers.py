@@ -1,6 +1,6 @@
 """
  *  date   : 2022/03/23
- *  Version : 0.3
+ *  Version : 0.4
  *  author : Abdul Moez (abdulmoez123456789@gmail.com)
  *  Study  : UnderGraduate in GCU Lahore, Pakistan
  *  https://github.com/Anonym0usWork1221/android-memorytool
@@ -31,14 +31,14 @@ class LibsControllers:
         mem_file = open(f"/proc/{pid}/mem", "rb+")
         try:
             mem_file.seek(read_address)
-            value = mem_file.read(buf)
+            founded_value_on_address = mem_file.read(buf)
             mem_file.close()
-            return value
+            return founded_value_on_address
         except Exception as e:
             print("[*] Exception ", e)
         return None
 
-    def address_refiners(self, pid: str, list_address: list, buf: int, changed_value: any) -> any:
+    def address_refiners(self, pid: str, list_address: list, buf: int, changed_value: any) -> list:
         refined_address = []
         for address in list_address:
             read_value = self.read_lib_offsets(pid, 0x0, address, buf)

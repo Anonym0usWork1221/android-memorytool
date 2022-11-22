@@ -1,6 +1,6 @@
 """
  *  date   : 2022/03/23
- *  Version : 0.3
+ *  Version : 0.4
  *  author : Abdul Moez (abdulmoez123456789@gmail.com)
  *  Study  : UnderGraduate in GCU Lahore, Pakistan
  *  https://github.com/Anonym0usWork1221/android-memorytool
@@ -25,6 +25,9 @@ class SearchAndWrite:
 
     def get_writer_values(self) -> list:
         return self._returned_values.get()
+
+    def reset_queue(self) -> None:
+        self._returned_values.queue.clear()
 
     @store_in_queue
     def speed_search_and_write(self, pid: str, address_list: list, buf: int, read: any, write: any) -> int:
