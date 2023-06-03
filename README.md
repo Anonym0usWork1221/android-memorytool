@@ -7,8 +7,7 @@ AndroidMemoryTool
 [![Python](https://img.shields.io/badge/language-Python%203-blue.svg)](https://www.python.org)
 [![GPT_LICENSE](https://img.shields.io/badge/license-GPL-red.svg)](https://opensource.org/licenses/)
 ![code size](https://img.shields.io/github/languages/code-size/Anonym0usWork1221/android-memorytool)
-.. image:: https://img.shields.io/sourceforge/dt/android-memorytool.svg
-    :alt: SourceForge - Downloads
+
 
 -----------
 
