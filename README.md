@@ -1,5 +1,7 @@
 AndroidMemoryTool
 ====
+![PyPI - Version](https://img.shields.io/pypi/v/androidMemoryTool?label=pypi%20package)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/androidMemoryTool)
 [![GitHub stars](https://img.shields.io/github/stars/Anonym0usWork1221/android-memorytool.svg)](https://github.com/Anonym0usWork1221/android-memorytool/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/Anonym0usWork1221/android-memorytool.svg)](https://github.com/Anonym0usWork1221/android-memorytool/network/members)
 [![GitHub issues](https://img.shields.io/github/issues/Anonym0usWork1221/android-memorytool.svg)](https://github.com/Anonym0usWork1221/android-memorytool/issues)
