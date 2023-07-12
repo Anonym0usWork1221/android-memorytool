@@ -7,7 +7,7 @@ license = (this_directory / "LICENSE.md").read_text()
 
 setup(
     name='androidMemoryTool',
-    version='0.4',
+    version='0.5',
     packages=["androidMemoryTool"],
     license="GPL-3.0 license",
     author='Abdul Moez',
@@ -21,6 +21,10 @@ setup(
         ('', ['LICENSE.md']),
     ],
     install_requires=['wheel'],
+    entry_points={
+        'console_scripts': ['amt=androidMemoryTool.__main__:execute_cli']
+    },
+    python_requires=">=3.0",
     classifiers=[
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
         "Operating System :: OS Independent",

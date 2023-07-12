@@ -18,9 +18,9 @@ AndroidMemoryTool
 .This Tool is written in python using ctypes not affective as c.
 If you find any bug or not working function you can contact me. 
 
- *  Date   : 2022/03/23
+ *  Date   : 2023/07/11
  *  Author : **__Abdul Moez__**
- *  Version : 0.4
+ *  Version : 0.5
  *  Study  : UnderGraduate in GCU Lahore, Pakistan
  *  Repository  : https://github.com/Anonym0usWork1221/android-memorytool
  *  Documentation: https://github.com/Anonym0usWork1221/android-memorytool/tree/main/Documentation  
@@ -30,31 +30,39 @@ If you find any bug or not working function you can contact me.
 
  Copyright (c) 2022 AbdulMoez
 
+-----------
+
 # Note
-    1. This documentation is for 0.4 version (UPDATED)
+    1. This documentation is for 0.5 version (UPDATED)
     2. You can find old version on pypi if you want to use them
 
-# Version 0.4
-    -> Optimized the code
-    -> Increase Stability
-    -> Fixed Known bugs:
-        -> Fixed Simple Text search returning same values as previous search problem
-        -> Fixed Increasing Values/address problem in Fast search algorithms
-        -> Fixed output pattern in raw dump
-    
-    -> Added Reset function for queue
-    -> Added Hex Pattern Finder 87 ?? BB
-    -> Added Hex search for (Float, Dword, Double)
-    -> Added support for fork() process (by default takes first pid as parent)
-    -> Added Manually PID entering support either in int or string (pid=714 or pid="714")
-    -> Can raw dump from Custom start_address-end_address ("4754D6E6-5754D6E6" or "client.so")
-    -> Added Known error files and its fixes in (ERRORS.md) file
-    -> Added Support to dump map file
-    -> Added UTF-8 and UTF-16E support for lib read/write
-    -> Added a Detailed Documentation File
-    -> Added Documentation string stub in AndroidMemoryTool class
+-----------
 
+# Version 0.5
+    -> ----------------------------------------MOD-LOGS-------------------------------------------------- <-
+
+    -> Fixed the invalid output of hex address in reading process
+    -> Fixed the read_lib and write_lib hex issue the now pass the hex as a
+       string in old method the calculation was generating errors due to hex value passed as integer
+    -> Optimize the code of DataClass.py
+    -> Fixed Initializers of some classes (e.g: ThreadingController and DataClasses)
+    -> Added Complete self explaining doc strings to all the classes and functions
+    -> Rewrite the Mapping class inorder to reduce junk size and correct the mapping of anonymous range.
+    -> Added new function of find_and_replace_hex_pattern() for search wild card and replace that in hex form
+       e.g: find_and_replace_hex_pattern(search_pattern='2D??3D', replace_pattern='1D4D2D')
+    -> Added CLI for command line interface
     
+    -> ----------------------------------------TO-DO---------------------------------------------------- <-
+    
+    -> TODO: Add Reverse engineering Support for offline binaries using known disassemblers (capstone, keystone, r2pipe)
+    -> TODO: Add Assembly support for reading and writing memory at runtime
+    
+    -> ----------------------------------------SUGGESTIONS---------------------------------------------- <-
+    
+    -> SUGGESTIONS: You can leave your suggestions either on my mailbox or discord server.
+
+
+-----------    
 
 Requirements
 -----------
@@ -63,20 +71,29 @@ Requirements
 
 * Android Requirements -> Rooted Device Needed
 
+-----------
+
 Installation
 ----------------------------------------
 1. **Simply install it by pip and use it in your project**  
-    ``pip install androidMemoryTool==0.4``
+    ``pip install androidMemoryTool==0.5``
 
 2. **Or by cloning and then run command**  
     ``pip install .``
 
 3. **Project live at**   
-    https://pypi.org/project/androidMemoryTool/0.4/
+    https://pypi.org/project/androidMemoryTool/0.5/
 
 
 Memory Tool with example which can be found in the   
 `Android-Py-Cheats-Script @ 9d2520e`.
+
+-----------
+Video Demo
+-----------
+[![Video Demo](https://img.youtube.com/vi/Ivyy6GQzm3w/0.jpg)](https://www.youtube.com/watch?v=Ivyy6GQzm3w)
+
+-----------
 
 ## Documentation  
 
@@ -173,6 +190,19 @@ for index in range(0, len(found_pattern[0])):
     print(f"{found_pattern[0][index]}: {found_pattern[2][index]}")
 print(f"Total Pattern found: {found_pattern[1]}")
 ```
+
+* Find and replace hex Patterns
+```python
+from androidMemoryTool import AndroidMemoryTool
+tool = AndroidMemoryTool(PKG=662, SPEED_MODE=True, WORKERS=55,
+                         pMAP=AndroidMemoryTool.PMAP(ALL=True))
+found_pattern = tool.find_and_replace_hex_pattern("87 ?? 2B", "87 1D 2B")
+for index in range(0, len(found_pattern[0])):
+    #              address                      hex value
+    print(f"{found_pattern[0][index]}: {found_pattern[2][index]}")
+print(f"Total Pattern found and replaced: {found_pattern[1]}") # returns number
+```
+
 * Dump Maps
 ```python
 from androidMemoryTool import AndroidMemoryTool
@@ -181,11 +211,159 @@ is_dumped = tool.dump_maps(path="./")
 print(is_dumped)
 ```
 
+-----------
+
+## Android Memory Tool CLI Documentation
+```
+-> This Version is come with an exciting feature called CLI (command line interface) means you dont need to execute the code everytime just use the tools cli to do short work.
+```
+
+The Android Memory Tool CLI is a command-line interface for the Android Memory Tool. It provides various commands to interact with memory in Android applications.
+
+### Usage  
+* For Linux:  
+```
+python3 -m androidMemoryTool <command> [options]
+```
+* For Android:
+Execute the tool with root privileges using `sudo`:
+```
+sudo python3 -m androidMemoryTool <command> [options]
+```
+
+* If you added the bin path of python libraries to environment variable then you can execute it directly
+````
+amt <command> [options]
+````
+**and use sudo for android**
+
+### Available Commands
+* `read_value`: Read a value from memory.
+* `read_write_value`: Read and write a value in memory.
+* `write_lib`: Write a value to a library.
+* `read_lib`: Read a value from a library.
+* `refiner_address`: Refine a list of addresses.
+* `get_module_base_address`: Get the base address of a module.
+* `raw_dump`: Dump a library as raw binary.
+* `find_hex_pattern`: Find a hexadecimal pattern in memory.
+* `find_and_replace_hex_pattern`: Find and replace a hexadecimal pattern in memory.
+* `dump_maps`: Dump memory maps.
+* `get_pid`: Return the PID of a process.
+* `help`: Display help information.
+
+### Command-line Data Types
+Pass them with just name as given below
+* `DWORD`
+* `FLOAT`
+* `DOUBLE`
+* `WORD`
+* `BYTE`
+* `QWORD`
+* `XOR`
+* `UTF_8`
+* `UTF_16LE`
+
+### Command Details
+You can get detailed information about each command and its usage by running:
+```
+python3 -m androidMemoryTool help <command>
+```
+For example, to get help for the read_value command, run:
+```
+python3 -m androidMemoryTool help read_value
+```
+
+### Examples
+* Read a value from memory:
+````
+python3 -m androidMemoryTool read_value <pkg> <type> <speed_mode> <workers> <read>
+````
+Replace <pkg>, <type>, <speed_mode>, <workers>, and <read> with the appropriate values.  
+
+* Read and write a value in memory:
+````
+python3 -m androidMemoryTool read_write_value <pkg> <type> <speed_mode> <workers> <read> <write>
+````
+Replace <pkg>, <type>, <speed_mode>, <workers>, <read>, and <write> with the appropriate values.
+
+* Write a value to a library:
+````
+python3 -m androidMemoryTool write_lib <pkg> <type> <base_address> <offset> <write_value>
+````
+Replace <pkg>, <type>, <base_address>, <offset>, and <write_value> with the appropriate values.
+
+* Read a value from a library:
+````
+python3 -m androidMemoryTool read_lib <pkg> <type> <base_address> <offset> [--value <value>]
+````
+Replace <pkg>, <type>, <base_address>, <offset>, and <value> with the appropriate values.
+
+* Refine a list of addresses:
+````
+python3 -m androidMemoryTool refiner_address <pkg> <type> <speed_mode> <workers> <list_address> <value_to_refine>
+````
+Replace <pkg>, <type>, <speed_mode>, <workers>, <list_address>, and <value_to_refine> with the appropriate values.
+
+* Get the base address of a module:
+````
+python3 -m androidMemoryTool get_module_base_address <pid> <module_name>
+````
+Replace <pid> and <module_name> with the appropriate values.
+
+* Dump a library as raw binary:
+````
+python3 -m androidMemoryTool raw_dump <pkg> <lib_name> [<path>]
+````
+Replace <pkg>, <lib_name>, and <path> with the appropriate values. The <path> argument is optional and defaults to the current directory.
+
+* Find a hexadecimal pattern in memory:
+````
+python3 -m androidMemoryTool find_hex_pattern <pkg> <type> <speed_mode> <workers> <hex_pattern>
+````
+Replace <pkg>, <type>, <speed_mode>, <workers>, and <hex_pattern> with the appropriate values.
+
+* Find and replace a hexadecimal pattern in memory:
+````
+python3 -m androidMemoryTool find_and_replace_hex_pattern <pkg> <type> <speed_mode> <workers> <search_pattern> <replace_pattern>
+````
+Replace <pkg>, <type>, <speed_mode>, <workers>, <search_pattern>, and <replace_pattern> with the appropriate values.
+
+* Dump memory maps:
+````
+python3 -m androidMemoryTool dump_maps <pkg> [--path <path>]
+````
+Replace <pkg> and <path> with the appropriate values. The <path> argument is optional and defaults to the current directory.
+
+* Return the PID of a process:
+````
+python3 -m androidMemoryTool get_pid <pkg>
+````
+Replace <pkg> with the appropriate package name.
+
+### Version
+To get the version of the Android Memory Tool, use the following command:
+````
+python3 -m androidMemoryTool -v
+````
+### Help
+To display general help information or help for a specific command, use the help command:
+````
+python3 -m androidMemoryTool help [command]
+````
+Replace [command] with the desired command to get help for that command. If no command is provided, general help information will be displayed.
+
+
+-----------
+
 # Detailed Documentation
-You can found detailed documentation [here](https://github.com/Anonym0usWork1221/android-memorytool/tree/main/Documentation)
+You can find detailed documentation [here](https://github.com/Anonym0usWork1221/android-memorytool/tree/main/Documentation)
+
+-----------
 
 # Errors
 Some known errors and their solutions can be found [here](https://github.com/Anonym0usWork1221/android-memorytool/blob/main/ERRORS.md)   
+
+-----------
 
 Supported Data Types
 -------------------
@@ -225,12 +403,15 @@ Supported Map Ranges
 | B_Bad           | Bad          | Bad Memory (dangerous)                 |
 | CODE_SYSTEM     | Code system  | Code system memory (dangerous)         |
 
+-----------
+
 # Contributor
 
 <a href = "https://github.com/Anonym0usWork1221/android-memorytool/graphs/contributors">
   <img src = "https://contrib.rocks/image?repo=Anonym0usWork1221/android-memorytool"/>
 </a>
 
+-----------
 
 Assistance
 ----------
@@ -242,6 +423,7 @@ I also created a Discord group:
 
 * Server     : https://discord.gg/RMNcqzmt9f
 
+-----------
 
 Buy Me a coffee
 --------------

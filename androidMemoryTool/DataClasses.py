@@ -1,18 +1,18 @@
 """
- *  date   : 2022/03/23
- *  Version : 0.4
+ *  date   : 2023/07/11
+ *  Version : 0.5
  *  author : Abdul Moez (abdulmoez123456789@gmail.com)
  *  Study  : UnderGraduate in GCU Lahore, Pakistan
  *  https://github.com/Anonym0usWork1221/android-memorytool
 
 """
 
-from struct import pack, unpack
-from sys import byteorder
-from os import popen
-from binascii import unhexlify
-from dataclasses import dataclass
+from subprocess import check_output, CalledProcessError
 from .mapping import Mapping
+from dataclasses import dataclass
+from struct import pack, unpack
+from binascii import unhexlify
+from sys import byteorder
 
 
 class DataClasses:
@@ -27,6 +27,10 @@ class DataClasses:
 
     @dataclass()
     class DataTypes:
+        """
+        Data class that defines different data types used in the code.
+        """
+
         DWORD: str = "DWORD"
         FLOAT: str = "FLOAT"
         DOUBLE: str = "DOUBLE"
@@ -39,6 +43,10 @@ class DataClasses:
 
     @dataclass()
     class PMAP:
+        """
+            Data class that defines different options for memory mapping.
+        """
+
         ALL: bool = True
         B_BAD: bool = False
         C_ALLOC: bool = False
@@ -54,83 +62,107 @@ class DataClasses:
         CODE_APP: bool = False
         V_video: bool = False
 
-    def __int__(self):
-        pass
+    def __init__(self):
+        ...
 
     @staticmethod
     def get_pid(pkg: any((str, int))) -> str:
-        pid_id = None
-        if isinstance(pkg, int):
-            pkg = str(pkg)
-            pid_id = popen(f"ps -q {pkg} -o cmd=")
-            if pid_id.read() is None:
-                return ""
-            return str(pkg)
+        """
+            Retrieves the process ID (PID) for the given package name or PID.
 
+            Args:
+                pkg: The package name or PID.
+
+            Returns:
+                The process ID (PID) as a string.
+        """
+
+        pkg = str(pkg)
+        # if the pkg is numeric string
         if pkg.isnumeric():
-            pkg = str(pkg)
-            pid_id = popen(f"ps -q {pkg} -o cmd=")
-            if pid_id.read() is None:
-                return ""
-            return str(pkg)
-
-        try:
-            pid_id = popen("pidof {}".format(pkg))
-        except Exception as e:
-            print("[*]Exception ", e)
-
-        pid_decode = pid_id.read()
-        if pid_decode is not None:
-            process_id = pid_decode.replace("\n", "").split(" ")
-            if len(process_id) > 1:
-                print("[*] Multiple PIDS found using first PID: %s" % process_id[0])
-            return str(process_id[0])
+            try:
+                pid_id = check_output(["ps", "-q", pkg, "-o", "cmd="])
+                return pkg if pid_id.decode().strip() is not None else ""
+            except CalledProcessError:
+                print("[-] Processes is not running")
         else:
-            return ""
+            try:
+                pid_id = check_output(["pidof", "-s", pkg])  # gets the first id if multiple ids found
+                process_ids = pid_id.decode().strip()
+                return str(process_ids)
+            except CalledProcessError:
+                print("[-] Processes is not running")
+
+        return ""
 
     def init_setup(self, PKG: any((str, int)), TYPE=DataTypes.DWORD, SPEED_MODE=False, WORKERS=55) -> None:
+        """
+        Initializes the setup with the specified package, data type, speed mode, and number of workers.
+
+        Args:
+            PKG: The package name or PID.
+            TYPE: The data type.
+            SPEED_MODE: Flag indicating whether speed mode is enabled or not.
+            WORKERS: The number of workers.
+
+        Returns:
+            None.
+        """
+
         self._DATA_TYPES = TYPE
         self._PKG_NAME = PKG
         self._IS_SPEED_MODE = SPEED_MODE
         self._TOTAL_WORKERS = WORKERS
 
     def identify_dict(self, P=PMAP()) -> list:
-        wanted_ranges = [k for k, v in P.__dict__.items() if v]
-        address = []
+        """
+        Identifies the memory addresses based on the given memory mapping options.
 
-        for i in wanted_ranges:
-            if i == "ALL":
-                address = Mapping.mapping_all(self.get_pid(self._PKG_NAME))["address"]
-                return address
-            elif i == "B_BAD":
-                address.extend(Mapping.mapping_b(self.get_pid(self._PKG_NAME))["address"])
-            elif i == "C_ALLOC":
-                address.extend(Mapping.mapping_ca(self.get_pid(self._PKG_NAME))["address"])
-            elif i == "C_BSS":
-                address.extend(Mapping.mapping_cb(self.get_pid(self._PKG_NAME))["address"])
-            elif i == "C_DATA":
-                address.extend(Mapping.mapping_cd(self.get_pid(self._PKG_NAME))["address"])
-            elif i == "C_HEAP":
-                address.extend(Mapping.mapping_ch(self.get_pid(self._PKG_NAME))["address"])
-            elif i == "JAVA_HEAP":
-                address.extend(Mapping.mapping_jh(self.get_pid(self._PKG_NAME))["address"])
-            elif i == "A_ANONYMOUS":
-                address.extend(Mapping.mapping_a(self.get_pid(self._PKG_NAME))["address"])
-            elif i == "CODE_SYSTEM":
-                address.extend(Mapping.mapping_xs(self.get_pid(self._PKG_NAME))["address"])
-            elif i == "STACK":
-                address.extend(Mapping.mapping_s(self.get_pid(self._PKG_NAME))["address"])
-            elif i == "ASHMEM":
-                address.extend(Mapping.mapping_as(self.get_pid(self._PKG_NAME))["address"])
-            elif i == "J_Java":
-                address.extend(Mapping.mapping_j(self.get_pid(self._PKG_NAME))["address"])
-            elif i == "CODE_APP":
-                address.extend(Mapping.mapping_xa(self.get_pid(self._PKG_NAME))["address"])
-            elif i == "V_video":
-                address.extend(Mapping.mapping_v(self.get_pid(self._PKG_NAME))["address"])
-        return address
+        Args:
+            P: The memory mapping options.
+
+        Returns:
+            A list of identified memory addresses.
+        """
+        mapping_functions = {
+            "ALL": Mapping.mapping_all,
+            "B_BAD": Mapping.mapping_b,
+            "C_ALLOC": Mapping.mapping_ca,
+            "C_BSS": Mapping.mapping_cb,
+            "C_DATA": Mapping.mapping_cd,
+            "C_HEAP": Mapping.mapping_ch,
+            "JAVA_HEAP": Mapping.mapping_jh,
+            "A_ANONYMOUS": Mapping.mapping_a,
+            "CODE_SYSTEM": Mapping.mapping_xs,
+            "STACK": Mapping.mapping_s,
+            "ASHMEM": Mapping.mapping_as,
+            "J_Java": Mapping.mapping_j,
+            "CODE_APP": Mapping.mapping_xa,
+            "V_video": Mapping.mapping_v
+        }
+
+        wanted_ranges = [k for k, v in P.__dict__.items() if v]
+        address_set = set()
+
+        for map_name in wanted_ranges:
+            if map_name in mapping_functions:
+                address_set.update(mapping_functions[map_name](self.get_pid(self._PKG_NAME))["address"])
+                if map_name == "ALL":
+                    break
+
+        return list(address_set)
 
     def data_type_encoding(self, read: any, write=None) -> any:
+        """
+            Encodes the data values based on the specified data type for searching or writing in memory.
+
+            Args:
+                read: The value to be encoded for searching in memory.
+                write: The value to be encoded for writing in memory.
+
+            Returns:
+                The encoded search value and replace value (if provided).
+        """
         if self._DATA_TYPES == "DWORD":
             if write:
                 if "h" in str(read).lower():
@@ -310,208 +342,141 @@ class DataClasses:
             return None
 
     def data_type_decoding(self, read: any, write=None) -> any:
-        if self._DATA_TYPES == "DWORD":
-            if write:
-                if byteorder == 'little':
-                    search_value = unpack('<i', read)
-                    replace_value = unpack('<i', write)
-                else:
-                    search_value = unpack('>i', read)
-                    replace_value = unpack('>i', write)
+        """
+        Decodes the data values based on the specified data type after reading from memory.
 
-                return search_value, replace_value
+        Args:
+            read: The value to be decoded after reading from memory.
+            write: The value to be decoded after writing to memory.
 
-            else:
-                if byteorder == 'little':
-                    search_value = unpack('<i', read)
-                else:
-                    search_value = unpack('>i', read)
-                return search_value
+        Returns:
+            The decoded search value and replace value (if provided).
+        """
 
-        elif self._DATA_TYPES == "FLOAT":
-            if write:
-                if byteorder == 'little':
-                    search_value = unpack('<f', read)
-                    replace_value = unpack('<f', write)
-                else:
-                    search_value = unpack('>f', read)
-                    replace_value = unpack('>f', write)
-
-                return search_value, replace_value
-
-            else:
-                if byteorder == 'little':
-                    search_value = unpack('<f', read)
-                else:
-                    search_value = unpack('>f', read)
-                return search_value
-
-        elif self._DATA_TYPES == "DOUBLE":
-            if write:
-                if byteorder == 'little':
-                    search_value = unpack('<d', read)
-                    replace_value = unpack('<d', write)
-                else:
-                    search_value = unpack('>d', read)
-                    replace_value = unpack('>d', write)
-
-                return search_value, replace_value
-
-            else:
-                if byteorder == 'little':
-                    search_value = unpack('<d', read)
-                else:
-                    search_value = unpack('>d', read)
-                return search_value
-
-        elif self._DATA_TYPES == "WORD":
-            if write:
-                if byteorder == 'little':
-                    search_value = unpack('<h', read)
-                    replace_value = unpack('<h', write)
-                else:
-                    search_value = unpack('>h', read)
-                    replace_value = unpack('>h', write)
-
-                return search_value, replace_value
-
-            else:
-                if byteorder == 'little':
-                    search_value = unpack('<i', read)
-                else:
-                    search_value = unpack('>i', read)
-                return search_value
-
-        elif self._DATA_TYPES == "BYTE":
-            if write:
-                if byteorder == 'little':
-                    search_value = unpack('<b', read)
-                    replace_value = unpack('<b', write)
-                else:
-                    search_value = unpack('>b', read)
-                    replace_value = unpack('>b', write)
-
-                return search_value, replace_value
-
-            else:
-                if byteorder == 'little':
-                    search_value = unpack('<b', read)
-                else:
-                    search_value = unpack('>b', read)
-                return search_value
-
-        elif self._DATA_TYPES == "QWORD":
-            if write:
-                if byteorder == 'little':
-                    search_value = unpack('<q', read)
-                    replace_value = unpack('<q', write)
-                else:
-                    search_value = unpack('>q', read)
-                    replace_value = unpack('>q', write)
-
-                return search_value, replace_value
-
-            else:
-                if byteorder == 'little':
-                    search_value = unpack('<q', read)
-                else:
-                    search_value = unpack('>q', read)
-                return search_value
-
-        elif self._DATA_TYPES == "XOR":
-            if write:
-                if byteorder == 'little':
-                    search_value = unpack('<l', read)
-                    replace_value = unpack('<l', write)
-                else:
-                    search_value = unpack('>l', read)
-                    replace_value = unpack('>l', write)
-
-                return search_value, replace_value
-
-            else:
-                if byteorder == 'little':
-                    search_value = unpack('<l', read)
-                else:
-                    search_value = unpack('>l', read)
-                return search_value
-
-        elif self._DATA_TYPES == "UTF-8":
-            if write:
+        if write:
+            decode_func = unpack
+            search_value = replace_value = None
+            decode_format = ""
+            if self._DATA_TYPES == "DWORD":
+                decode_format = '<i' if byteorder == 'little' else '>i'
+            elif self._DATA_TYPES == "FLOAT":
+                decode_format = '<f' if byteorder == 'little' else '>f'
+            elif self._DATA_TYPES == "DOUBLE":
+                decode_format = '<d' if byteorder == 'little' else '>d'
+            elif self._DATA_TYPES == "WORD":
+                decode_format = '<h' if byteorder == 'little' else '>h'
+            elif self._DATA_TYPES == "BYTE":
+                decode_format = '<b' if byteorder == 'little' else '>b'
+            elif self._DATA_TYPES == "QWORD":
+                decode_format = '<q' if byteorder == 'little' else '>q'
+            elif self._DATA_TYPES == "XOR":
+                decode_format = '<l' if byteorder == 'little' else '>l'
+            elif self._DATA_TYPES == "UTF-8":
                 search_value = read.encode('utf-8')
                 replace_value = write.encode('utf-8')
-
-                return search_value, replace_value
-
-            else:
-                search_value = read.encode('utf-8')
-                return search_value
-
-        elif self._DATA_TYPES == "UTF-16LE":
-            if write:
+            elif self._DATA_TYPES == "UTF-16LE":
                 search_value = read.encode('utf-16LE')
                 replace_value = write.encode('utf-16LE')
-
-                return search_value, replace_value
-
             else:
-                search_value = read.encode('utf-16LE')
-                return search_value
+                return None
 
+            if search_value is None:
+                search_value = decode_func(decode_format, read)
+            if replace_value is None:
+                replace_value = decode_func(decode_format, write)
+
+            return search_value, replace_value
         else:
-            return None
+            decode_func = unpack
+            decode_format = None
+            search_value = None
+
+            if self._DATA_TYPES == "DWORD":
+                decode_format = '<i' if byteorder == 'little' else '>i'
+            elif self._DATA_TYPES == "FLOAT":
+                decode_format = '<f' if byteorder == 'little' else '>f'
+            elif self._DATA_TYPES == "DOUBLE":
+                decode_format = '<d' if byteorder == 'little' else '>d'
+            elif self._DATA_TYPES == "WORD":
+                decode_format = '<h' if byteorder == 'little' else '>h'
+            elif self._DATA_TYPES == "BYTE":
+                decode_format = '<b' if byteorder == 'little' else '>b'
+            elif self._DATA_TYPES == "QWORD":
+                decode_format = '<q' if byteorder == 'little' else '>q'
+            elif self._DATA_TYPES == "XOR":
+                decode_format = '<l' if byteorder == 'little' else '>l'
+            elif self._DATA_TYPES == "UTF-8":
+                search_value = read.encode('utf-8')
+            elif self._DATA_TYPES == "UTF-16LE":
+                search_value = read.encode('utf-16LE')
+            else:
+                return None
+
+            if decode_format:
+                search_value = decode_func(decode_format, read)
+
+            return search_value
 
     def data_type_bytes(self) -> int:
-        if self._DATA_TYPES == "DWORD":
-            return 4
+        """
+        Returns the number of bytes occupied by the current data type.
 
-        elif self._DATA_TYPES == "FLOAT":
-            return 4
+        Returns:
+            The number of bytes occupied by the current data type.
+        """
+        data_type_sizes = {
+            "DWORD": 4,
+            "FLOAT": 4,
+            "DOUBLE": 8,
+            "WORD": 2,
+            "BYTE": 1,
+            "QWORD": 8,
+            "XOR": 4,
+            "UTF-8": 0,
+            "UTF-16LE": 0
+        }
 
-        elif self._DATA_TYPES == "DOUBLE":
-            return 8
-
-        elif self._DATA_TYPES == "WORD":
-            return 2
-
-        elif self._DATA_TYPES == "BYTE":
-            return 1
-
-        elif self._DATA_TYPES == "QWORD":
-            return 8
-
-        elif self._DATA_TYPES == "XOR":
-            return 4
-
-        elif self._DATA_TYPES == "UTF-8":
-            return 0
-
-        elif self._DATA_TYPES == "UTF-16LE":
-            return 0
-
-        else:
-            return -1
+        return data_type_sizes.get(self._DATA_TYPES, -1)
 
     def init_tool(self, pMAP=PMAP()) -> None:
+        """
+            Initializes the memory tool with the specified memory mapping options.
+
+            Args:
+                pMAP: The memory mapping options.
+
+            Returns:
+                None.
+        """
         self._MAPS_ADDR = self.identify_dict(pMAP)
         self._DATA_BYTE = self.data_type_bytes()
         self._PID = self.get_pid(self._PKG_NAME)
 
     def get_variables(self, is_speed=False, is_pkg=False, is_data_type=False, is_workers=False, is_map_addr=False,
                       is_data_byte=False, is_pid=False) -> any:
-        if is_speed:
-            return self._IS_SPEED_MODE
-        elif is_pkg:
-            return self._PKG_NAME
-        elif is_workers:
-            return self._TOTAL_WORKERS
-        elif is_data_type:
-            return self._DATA_TYPES
-        elif is_map_addr:
-            return self._MAPS_ADDR
-        elif is_data_byte:
-            return self._DATA_BYTE
-        elif is_pid:
-            return self._PID
-        else:
-            return None
+        """
+        Retrieves the specified variable based on the provided flags.
+
+        Args:
+            is_speed: Flag indicating whether to retrieve the speed mode value.
+            is_pkg: Flag indicating whether to retrieve the package name value.
+            is_data_type: Flag indicating whether to retrieve the data type value.
+            is_workers: Flag indicating whether to retrieve the number of workers value.
+            is_map_addr: Flag indicating whether to retrieve the memory map addresses value.
+            is_data_byte: Flag indicating whether to retrieve the data type bytes value.
+            is_pid: Flag indicating whether to retrieve the process ID (PID) value.
+
+        Returns:
+            The requested variable value.
+        """
+        variables = {
+            is_speed: self._IS_SPEED_MODE,
+            is_pkg: self._PKG_NAME,
+            is_workers: self._TOTAL_WORKERS,
+            is_data_type: self._DATA_TYPES,
+            is_map_addr: self._MAPS_ADDR,
+            is_data_byte: self._DATA_BYTE,
+            is_pid: self._PID
+        }
+
+        return variables.get(True, None)
