@@ -11,116 +11,190 @@ AndroidMemoryTool
 ![code size](https://img.shields.io/github/languages/code-size/Anonym0usWork1221/android-memorytool)
 
 
+<br>
+<br>
+<p align="center">
+  <img src="assets/android_memory_tool.jpg"  title="Android Memory Tool" width="500px">
+</p>
+
 -----------
 
+__*AndroidMemoryTool*__: A Powerful Memory Reader and Writer Tool for Android, Linux, and Windows Operating Systems
 
-**_AndroidMemoryTool_** is a memory reader and writer tool designed for android and linux os's 
-.This Tool is written in python using ctypes not affective as c.
-If you find any bug or not working function you can contact me. 
+AndroidMemoryTool is a sophisticated memory manipulation tool meticulously crafted for use on Android, Linux, and 
+Windows operating systems. This versatile tool is meticulously coded in Python, utilizing ctypes and struct datatypes, 
+ensuring efficiency comparable to C.
 
- *  Date   : 2023/07/11
+Our commitment to excellence extends to our support system. If you encounter any bugs or non-functional features, 
+please do not hesitate to contact us. Your feedback is invaluable in our pursuit of continuous improvement.
+
+ *  Date   : 2023/09/30
  *  Author : **__Abdul Moez__**
- *  Version : 0.5
+ *  Version : 0.6 (+Windows Support)
  *  Study  : UnderGraduate in GCU Lahore, Pakistan
- *  Repository  : https://github.com/Anonym0usWork1221/android-memorytool
- *  Documentation: https://github.com/Anonym0usWork1221/android-memorytool/tree/main/Documentation  
+ *  Repository  : [Main Branch](https://github.com/Anonym0usWork1221/android-memorytool)
+ *  Documentation: [AndroidMemoryToolExtensiveDocumentation](https://github.com/Anonym0usWork1221/android-memorytool/tree/main/Documentation)
 
 
- GNU General Public License 
-
- Copyright (c) 2022 AbdulMoez
+ GNU General Public License  
+ Copyright (c) 2023 AbdulMoez
 
 -----------
 
 # Note
-    1. This documentation is for 0.5 version (UPDATED)
+    1. This documentation is for 0.6 version (UPDATED)
     2. You can find old version on pypi if you want to use them
 
 -----------
 
-# Version 0.5
-    -> ----------------------------------------MOD-LOGS-------------------------------------------------- <-
+# Version 0.6
 
-    -> Fixed the invalid output of hex address in reading process
-    -> Fixed the read_lib and write_lib hex issue the now pass the hex as a
-       string in old method the calculation was generating errors due to hex value passed as integer
-    -> Optimize the code of DataClass.py
-    -> Fixed Initializers of some classes (e.g: ThreadingController and DataClasses)
-    -> Added Complete self explaining doc strings to all the classes and functions
-    -> Rewrite the Mapping class inorder to reduce junk size and correct the mapping of anonymous range.
-    -> Added new function of find_and_replace_hex_pattern() for search wild card and replace that in hex form
-       e.g: find_and_replace_hex_pattern(search_pattern='2D??3D', replace_pattern='1D4D2D')
-    -> Added CLI for command line interface
-    
-    -> ----------------------------------------TO-DO---------------------------------------------------- <-
-    
-    -> TODO: Add Reverse engineering Support for offline binaries using known disassemblers (capstone, keystone, r2pipe)
-    -> TODO: Add Assembly support for reading and writing memory at runtime
-    
-    -> ----------------------------------------SUGGESTIONS---------------------------------------------- <-
-    
-    -> SUGGESTIONS: You can leave your suggestions either on my mailbox or discord server.
+````
+-----------------------------------------MODIFICATION LOG--------------------------------------------------
+
+1. Added Support for Windows OS (while maintaining compatibility with existing API calls).
+2. Introduced a Robust Memory Profiler capable of threshold-based memory leak and churn detection using process IDs.
+3. Customizability of the Memory Profiler has been enhanced (Please refer to the documentation for details).
+4. Introduced several static methods, including:
+  - get_developer
+  - get_version_code
+  - get_cpu_counts
+  - get_platform
+  - is_root_acquired
+5. We are pleased to announce the addition of group search support with a new parameter, "is_grouped," 
+   which can be set to True. This enhancement allows users to perform grouped searches effectively and efficiently. 
+   By default, the value of the range is set to 512, aligning with the capabilities of Game Guardian.
+
+6. We have recently introduced two new error classes to enhance the functionality of our memory tool: 
+   WINAPIException and PIDException. These additions further bolster our product's robustness and error-handling 
+   capabilities, ensuring a more seamless and reliable user experience.
+7. We've meticulously updated and expanded our documentation to ensure that it's more informative, user-friendly, 
+   and grammatically impeccable than ever before.
+--------------------------------------------TO-DO LIST----------------------------------------------------
+
+1. FIXME: Resolve the speed mode bug on Windows OS.
+2. TODO: Implement Reverse Engineering Support for offline binaries using renowned disassemblers such as Capstone, 
+         Keystone, and R2pipe.
+3. TODO: Add Assembly support for runtime memory reading and writing.
+4. TODO: Incorporate wildcard support in Windows API.
+5. TODO: Expand the functionality with additional API handling methods.
+
+----------------------------------------SUGGESTIONS-------------------------------------------------------
+
+Your valuable suggestions are welcome through either direct messages or our Discord server.
+
+-------------------------------------------NOTICE--------------------------------------------------------
+
+This update has significantly increased the complexity of the Memory Tool, making it increasingly challenging for a 
+single individual to manage its development. Therefore, we warmly welcome contributions from anyone interested in 
+collaborating on its further enhancement.
+````
 
 
------------    
+-----------
+Supported Platforms
+-----------
+* Windows Support (Started from 0.6 Version)
+* Linux Support (Started From 0.2 Version)
+* Android Support (Started From 0.1 Version)
 
+-----------
+Supported ByteOrders
+-----------
+* Little-Endian
+* Big-Endian
+
+-----------
+Tested Platforms
+-----------
+> Our tool has been rigorously tested and proven to run seamlessly on the following platforms:
+
+* Windows 11 (64-bit)
+* Linux - Kali Linux (64-bit)
+* Android - Xiaomi 11T (Termux, 64-bit, Android 13)
+
+> Rest assured, our commitment to compatibility ensures a smooth and efficient user experience across these platforms.
+
+-----------
 Requirements
 -----------
 
-* Python 3.x
+* Python 3.5+
+* Android Requirements: Rooted Device Required
+* Linux Requirements: Root access may be necessary on certain Linux platforms.
+* Windows Requirements: Administrator permissions required
 
-* Android Requirements -> Rooted Device Needed
 
 -----------
+Dependencies
+-----------
+* Pip Dependencies (Automatically Installed in Requirements): `psutil`
 
+-----------
 Installation
 ----------------------------------------
-1. **Simply install it by pip and use it in your project**  
-    ``pip install androidMemoryTool==0.5``
+1. **Installation via Pip for Easy Integration into Your Project**  
+    To effortlessly incorporate the Android Memory Tool into your project, execute the following pip command:  
+    > pip install androidMemoryTool==0.6
 
-2. **Or by cloning and then run command**  
-    ``pip install .``
+2. **Installation by Cloning the Repository and Running Commands**  
+    Alternatively, you can acquire the Android Memory Tool by cloning the GitHub repository and executing the 
+    subsequent commands:
+   > git clone https://github.com/Anonym0usWork1221/android-memorytool/tree/main   
+    cd android-memorytool  
+    pip install .
 
-3. **Project live at**   
-    https://pypi.org/project/androidMemoryTool/0.5/
+3. **Project live at**  
+    [PyPi-0.6](https://pypi.org/project/androidMemoryTool/0.6/)
 
 
-Memory Tool with example which can be found in the   
-`Android-Py-Cheats-Script @ 9d2520e`.
+Utilize our cutting-edge Memory Tool, replete with intricate examples, readily accessible within the designated folder.
+[Access Android-Py-Cheats-Script @ 9d2520e](https://github.com/Anonym0usWork1221/Android-Py-Cheats-Script/tree/014497b78538930082109e8dd3da123e7f75197e).
 
 -----------
-Video Demo
+Video Demo - 0.5
 -----------
-[![Video Demo](https://img.youtube.com/vi/Ivyy6GQzm3w/0.jpg)](https://www.youtube.com/watch?v=Ivyy6GQzm3w)
+[![Video Demo](https://img.youtube.com/vi/5jV1haoEyWQ/0.jpg)](https://www.youtube.com/watch?v=5jV1haoEyWQ)
 
 -----------
 
 ## Documentation  
 
-* Getting Process ID
+* **Getting Process ID**  
+To obtain the Process ID (PID) of a target process, you can use the following code snippet:
 
 ```py
 from androidMemoryTool import AndroidMemoryTool
-tool = AndroidMemoryTool.get_pid('ac_client') # for android use package name e.g(com.app.org)
-print(tool)
+# Initialize the tool and set the speed_mode to off for Windows in this version only.
+tool = AndroidMemoryTool(PKG="ac_client")
+pid = tool.get_pid()
+print(pid)
 ```
-* Getting Module Base
+* **Getting Module Base**  
+To retrieve the base address of a specific module in the target process, you can use the following code snippet:
 
 ```py
 from androidMemoryTool import AndroidMemoryTool
-pid = AndroidMemoryTool.get_pid('ac_client')
-base_addr = AndroidMemoryTool.get_module_base_address(pid, "client.so")
+
+tool = AndroidMemoryTool(PKG="ac_client")
+base_addr = tool.get_module_base_address("client.so")
 print(base_addr)
 ```
 
-* Searching and Read process memory
+* **Searching and Reading Process Memory**  
+To search for a specific value in the process memory and read the results, use the following code:
 
 ```py
-from androidMemoryTool import AndroidMemoryTool
+from androidMemoryTool import AndroidMemoryTool, DataTypes, PMAP
 
-# initialize tool
-tool = AndroidMemoryTool(PKG="ac_client", TYPE=AndroidMemoryTool.DataTypes.DWORD, SPEED_MODE=False, WORKERS=55,
-                        pMAP=AndroidMemoryTool.PMAP(ALL=True))
+# Initialize the tool and set the speed_mode to off for Windows in this version only.
+tool = AndroidMemoryTool(PKG="Tutorial-x86_64.exe",
+                         SPEED_MODE=False,
+                         TYPE=DataTypes.DWORD,
+                         WORKERS=AndroidMemoryTool.get_cpu_counts(fraction=2),
+                         pMAP=PMAP(ALL=True)
+                         )
+# Search for a value in the entire memory.
 values = tool.read_value(100)
 founded_offsets = values[0]
 founded_values = values[1]
@@ -128,263 +202,258 @@ print(founded_values)
 print(founded_offsets)
 ```
 
-* Search and Write process memory
+* **Searching and Writing Process Memory**  
+You can search for a specific value in the process memory and replace it with a new value using the following code:
 
 ```py
-from androidMemoryTool import AndroidMemoryTool
+from androidMemoryTool import AndroidMemoryTool, DataTypes, PMAP
 
-# initialize tool
-tool = AndroidMemoryTool(PKG="ac_client", TYPE=AndroidMemoryTool.DataTypes.DWORD, SPEED_MODE=False, WORKERS=55,
-                      pMAP=AndroidMemoryTool.PMAP(ALL=True))
-
+# Initialize the tool and set the speed_mode to off for Windows in this version only.
+tool = AndroidMemoryTool(PKG="Tutorial-x86_64.exe",
+                         SPEED_MODE=False,
+                         TYPE=DataTypes.DWORD,
+                         WORKERS=AndroidMemoryTool.get_cpu_counts(fraction=2),
+                         pMAP=PMAP(ALL=True)
+                         )
+# Search for all values and replace them with a new value.
 values1 = tool.read_write_value(100, 10)
 print(values1)
 ```
 
-* Read address value
+* **Reading Address Value**  
+To read the value at a specific memory address, use the following code:
+
 ```py
-from androidMemoryTool import AndroidMemoryTool
-pid = AndroidMemoryTool.get_pid('ac_client')
-base_addr = AndroidMemoryTool.get_module_base_address(pid, "client.so")
-tool = AndroidMemoryTool(PKG="ac_client", TYPE=AndroidMemoryTool.DataTypes.DWORD)
-values1 = tool.read_lib(base_addr, 0xfff150d)
+from androidMemoryTool import AndroidMemoryTool, DataTypes
+
+tool = AndroidMemoryTool(PKG="ac_client",
+                         TYPE=DataTypes.DWORD
+                         )
+base_addr = tool.get_module_base_address("client.so")
+values1 = tool.read_lib(base_addr, '0xfff150d')
+print(values1)
+
+```
+
+* **Writing Address Value**  
+To write a value to a specific memory address, use the following code:
+
+```py
+from androidMemoryTool import AndroidMemoryTool, DataTypes
+
+tool = AndroidMemoryTool(PKG="ac_client", TYPE=DataTypes.DWORD)
+base_addr = tool.get_module_base_address("client.so")
+values1 = tool.write_lib(base_addr, '0xfff150d', 58)
 print(values1)
 ```
 
-* Write address value
-```py
-from androidMemoryTool import AndroidMemoryTool
-pid = AndroidMemoryTool.get_pid('ac_client')
-base_addr = AndroidMemoryTool.get_module_base_address(pid, "client.so")
-tool = AndroidMemoryTool(PKG="ac_client", TYPE=AndroidMemoryTool.DataTypes.DWORD)
-values1 = tool.write_lib(base_addr, 0xfff150d, 58)
-print(values1)
-```
+* **Raw Dump Process Memory**  
+You can dump the memory of a process using the following code:
 
-* Raw Dump Process memory 
 ```py
 from androidMemoryTool import AndroidMemoryTool
+
 tool = AndroidMemoryTool(PKG="ac_client")
-dump = tool.raw_dump(lib_name='client.so', path='/home/kali/Documents/')
-print(dump) # True or False
+dump = tool.raw_dump(lib_name='client.so', path='./')
+print(dump)
 ```
 
-* Address Refiner 
+* **Address Refiner**  
+To refine addresses based on a value, use the following code:
+
 ```py
-from androidMemoryTool import AndroidMemoryTool
-tool = AndroidMemoryTool(PKG="ac_client", TYPE=AndroidMemoryTool.DataTypes.DWORD, SPEED_MODE=False, WORKERS=55,
-                     pMAP=AndroidMemoryTool.PMAP(ALL=True))
+from androidMemoryTool import AndroidMemoryTool, DataTypes, PMAP
+
+tool = AndroidMemoryTool(PKG="Tutorial-x86_64.exe",
+                         SPEED_MODE=False,
+                         TYPE=DataTypes.DWORD,
+                         WORKERS=AndroidMemoryTool.get_cpu_counts(fraction=2),
+                         pMAP=PMAP(ALL=True)
+                         )
 values = tool.read_value(100)
 founded_offsets = values[0]
 refined_address = tool.refiner_address(list_address=founded_offsets, value_to_refine=50)
 print(refined_address)
+
 ```
 
-* Find Hex Pattern
+* **Finding Hex Patterns (Linux and Android only)**   
+To locate hex patterns in memory, use the following code (Linux and Android only):
+
 ```python
-from androidMemoryTool import AndroidMemoryTool
-tool = AndroidMemoryTool(PKG=662, SPEED_MODE=True, WORKERS=55,
-                         pMAP=AndroidMemoryTool.PMAP(ALL=True))
+from androidMemoryTool import AndroidMemoryTool, DataTypes, PMAP
+
+tool = AndroidMemoryTool(PKG="Tutorial-x86_64.exe",
+                         SPEED_MODE=False,
+                         TYPE=DataTypes.DWORD,
+                         WORKERS=AndroidMemoryTool.get_cpu_counts(fraction=2),
+                         pMAP=PMAP(ALL=True)
+                         )
 found_pattern = tool.find_hex_pattern("87 ?? 2B")
 for index in range(0, len(found_pattern[0])):
     print(f"{found_pattern[0][index]}: {found_pattern[2][index]}")
 print(f"Total Pattern found: {found_pattern[1]}")
+
 ```
 
-* Find and replace hex Patterns
+* **Finding and Replacing Hex Patterns (Linux and Android only)**  
+To find and replace hex patterns in memory, use the following code (Linux and Android only):
+
 ```python
-from androidMemoryTool import AndroidMemoryTool
-tool = AndroidMemoryTool(PKG=662, SPEED_MODE=True, WORKERS=55,
-                         pMAP=AndroidMemoryTool.PMAP(ALL=True))
+from androidMemoryTool import AndroidMemoryTool, DataTypes, PMAP
+
+tool = AndroidMemoryTool(PKG="Tutorial-x86_64.exe",
+                         SPEED_MODE=False,
+                         TYPE=DataTypes.DWORD,
+                         WORKERS=AndroidMemoryTool.get_cpu_counts(fraction=2),
+                         pMAP=PMAP(ALL=True)
+                         )
 found_pattern = tool.find_and_replace_hex_pattern("87 ?? 2B", "87 1D 2B")
 for index in range(0, len(found_pattern[0])):
-    #              address                      hex value
     print(f"{found_pattern[0][index]}: {found_pattern[2][index]}")
-print(f"Total Pattern found and replaced: {found_pattern[1]}") # returns number
+print(f"Total Pattern found and replaced: {found_pattern[1]}")
 ```
 
-* Dump Maps
+* **Dumping Memory Maps**  
+You can dump the memory maps of a process using the following code:
+
 ```python
 from androidMemoryTool import AndroidMemoryTool
+
 tool = AndroidMemoryTool(PKG="ac_client")
 is_dumped = tool.dump_maps(path="./")
 print(is_dumped)
 ```
 
------------
+* **Group Search**  
+Perform a group search to read and modify multiple values at once in specific range:
 
+```python
+from androidMemoryTool import AndroidMemoryTool, DataTypes, PMAP
+
+tool = AndroidMemoryTool(PKG="Tutorial-x86_64.exe",
+                         SPEED_MODE=False,
+                         TYPE=DataTypes.DWORD,
+                         WORKERS=AndroidMemoryTool.get_cpu_counts(fraction=3),
+                         pMAP=PMAP(ALL=True)
+                         )
+values = tool.read_value(read=[1000, 100], is_grouped=True, range_val=510)
+for value in values[0]:
+    tool.write_lib(value, '0x0', 1000)
+print(f"Total Values Modified: {values[1]}")
+```
+
+* **Prebuilt Memory Profiler**  
+Utilize the prebuilt Memory Profiler to analyze memory usage:
+
+```python
+from androidMemoryTool import AndroidMemoryTool
+
+tool = AndroidMemoryTool(PKG="Tutorial-x86_64.exe")
+memory_profiler = tool.get_memory_profiler()
+memory_profiler.start_profiling(logging=False)
+```
+
+* **Static Methods**  
+The AndroidMemoryTool also provides static methods for various functionalities:
+
+```python
+from androidMemoryTool import AndroidMemoryTool
+
+# Get the name of the developer
+print(AndroidMemoryTool.get_developer())
+
+# Get the version code of the tool
+print(AndroidMemoryTool.get_version_code())
+
+# Get the number of CPU cores available on your device (can specify a fraction)
+print(AndroidMemoryTool.get_cpu_counts())
+
+# Get the platform the script is running on (Linux, Android, Windows)
+print(AndroidMemoryTool.get_platform(verbose=True))
+
+# Check if the script is running on a rooted terminal or non-rooted
+print(AndroidMemoryTool.is_root_acquired())
+```
+
+-----------
+## Error Handling Enhancements
+> We have introduced new error handling classes to enhance the robustness of our code. 
+> These error handling classes will help you better manage and troubleshoot issues that may arise during the 
+> execution of your code.
+
+*  **PIDException**:  
+The `PIDException` is raised when there is an issue with connecting to the specified process. 
+This error message provides valuable information to help you diagnose and resolve the problem efficiently.  
+
+```python
+try:
+    from androidMemoryTool import AndroidMemoryTool, PIDException
+    tool = AndroidMemoryTool(PKG="ac_client")
+except PIDException as e:
+    print(f"An error occurred while trying to connect to the process: {e}")
+```
+
+*  **WINAPIException (Only occur on Windows)**:  
+The `WINAPIException` is specific to Windows environments and is raised when an error occurs during a read operation. 
+This error message provides detailed information about the issue encountered during the reading process, making it 
+easier for you to pinpoint and rectify the problem.
+
+```python
+try:
+    from androidMemoryTool import AndroidMemoryTool, WINAPIException
+    tool = AndroidMemoryTool(PKG="ac_client")
+    tool.read_value(read="some_wrong_value")
+except WINAPIException as e:
+    print(f"An error occurred while reading a value: {e}")
+
+```
+
+-----------
 ## Android Memory Tool CLI Documentation
-```
--> This Version is come with an exciting feature called CLI (command line interface) means you dont need to execute the code everytime just use the tools cli to do short work.
-```
+> CLI Documentation Relocated: The CLI documentation has been relocated to the Documentation folder. 
+> You can access it by visiting the [AndroidMemoryToolCLIDOCS](https://github.com/Anonym0usWork1221/android-memorytool/tree/main/Documentation) on GitHub.
 
-The Android Memory Tool CLI is a command-line interface for the Android Memory Tool. It provides various commands to interact with memory in Android applications.
+-----------
+## Custom Android Memory Profiling Documentation
+> You can make custom Profiling tools by going to [MemoryProfilerDOCS](https://github.com/Anonym0usWork1221/android-memorytool/tree/main/Documentation) on GitHub.
 
-### Usage  
-* For Linux:  
-```
-python3 -m androidMemoryTool <command> [options]
-```
-* For Android:
-Execute the tool with root privileges using `sudo`:
-```
-sudo python3 -m androidMemoryTool <command> [options]
-```
+-----------
+# Comprehensive Documentation
+> For in-depth and comprehensive documentation, please refer to the following link:
+ [Comprehensive Documentation](https://github.com/Anonym0usWork1221/android-memorytool/tree/main/Documentation)
+-----------
 
-* If you added the bin path of python libraries to environment variable then you can execute it directly
-````
-amt <command> [options]
-````
-**and use sudo for android**
+# Troubleshooting Errors
+* **Windows ERROR ON `SPEED_MODE`**  
+An issue has been identified on Windows systems related to the SPEED_MODE option, 
+which may result in the application getting stuck in a thread indefinitely. As a temporary solution, 
+we recommend disabling the SPEED_MODE for Windows.
 
-### Available Commands
-* `read_value`: Read a value from memory.
-* `read_write_value`: Read and write a value in memory.
-* `write_lib`: Write a value to a library.
-* `read_lib`: Read a value from a library.
-* `refiner_address`: Refine a list of addresses.
-* `get_module_base_address`: Get the base address of a module.
-* `raw_dump`: Dump a library as raw binary.
-* `find_hex_pattern`: Find a hexadecimal pattern in memory.
-* `find_and_replace_hex_pattern`: Find and replace a hexadecimal pattern in memory.
-* `dump_maps`: Dump memory maps.
-* `get_pid`: Return the PID of a process.
-* `help`: Display help information.
-
-### Command-line Data Types
-Pass them with just name as given below
-* `DWORD`
-* `FLOAT`
-* `DOUBLE`
-* `WORD`
-* `BYTE`
-* `QWORD`
-* `XOR`
-* `UTF_8`
-* `UTF_16LE`
-
-### Command Details
-You can get detailed information about each command and its usage by running:
-```
-python3 -m androidMemoryTool help <command>
-```
-For example, to get help for the read_value command, run:
-```
-python3 -m androidMemoryTool help read_value
-```
-
-### Examples
-* Read a value from memory:
-````
-python3 -m androidMemoryTool read_value <pkg> <type> <speed_mode> <workers> <read>
-````
-Replace <pkg>, <type>, <speed_mode>, <workers>, and <read> with the appropriate values.  
-
-* Read and write a value in memory:
-````
-python3 -m androidMemoryTool read_write_value <pkg> <type> <speed_mode> <workers> <read> <write>
-````
-Replace <pkg>, <type>, <speed_mode>, <workers>, <read>, and <write> with the appropriate values.
-
-* Write a value to a library:
-````
-python3 -m androidMemoryTool write_lib <pkg> <type> <base_address> <offset> <write_value>
-````
-Replace <pkg>, <type>, <base_address>, <offset>, and <write_value> with the appropriate values.
-
-* Read a value from a library:
-````
-python3 -m androidMemoryTool read_lib <pkg> <type> <base_address> <offset> [--value <value>]
-````
-Replace <pkg>, <type>, <base_address>, <offset>, and <value> with the appropriate values.
-
-* Refine a list of addresses:
-````
-python3 -m androidMemoryTool refiner_address <pkg> <type> <speed_mode> <workers> <list_address> <value_to_refine>
-````
-Replace <pkg>, <type>, <speed_mode>, <workers>, <list_address>, and <value_to_refine> with the appropriate values.
-
-* Get the base address of a module:
-````
-python3 -m androidMemoryTool get_module_base_address <pid> <module_name>
-````
-Replace <pid> and <module_name> with the appropriate values.
-
-* Dump a library as raw binary:
-````
-python3 -m androidMemoryTool raw_dump <pkg> <lib_name> [<path>]
-````
-Replace <pkg>, <lib_name>, and <path> with the appropriate values. The <path> argument is optional and defaults to the current directory.
-
-* Find a hexadecimal pattern in memory:
-````
-python3 -m androidMemoryTool find_hex_pattern <pkg> <type> <speed_mode> <workers> <hex_pattern>
-````
-Replace <pkg>, <type>, <speed_mode>, <workers>, and <hex_pattern> with the appropriate values.
-
-* Find and replace a hexadecimal pattern in memory:
-````
-python3 -m androidMemoryTool find_and_replace_hex_pattern <pkg> <type> <speed_mode> <workers> <search_pattern> <replace_pattern>
-````
-Replace <pkg>, <type>, <speed_mode>, <workers>, <search_pattern>, and <replace_pattern> with the appropriate values.
-
-* Dump memory maps:
-````
-python3 -m androidMemoryTool dump_maps <pkg> [--path <path>]
-````
-Replace <pkg> and <path> with the appropriate values. The <path> argument is optional and defaults to the current directory.
-
-* Return the PID of a process:
-````
-python3 -m androidMemoryTool get_pid <pkg>
-````
-Replace <pkg> with the appropriate package name.
-
-### Version
-To get the version of the Android Memory Tool, use the following command:
-````
-python3 -m androidMemoryTool -v
-````
-### Help
-To display general help information or help for a specific command, use the help command:
-````
-python3 -m androidMemoryTool help [command]
-````
-Replace [command] with the desired command to get help for that command. If no command is provided, general help information will be displayed.
-
+> Some other known errors and their solutions can be found [here](https://github.com/Anonym0usWork1221/android-memorytool/blob/main/ERRORS.md)   
 
 -----------
 
-# Detailed Documentation
-You can find detailed documentation [here](https://github.com/Anonym0usWork1221/android-memorytool/tree/main/Documentation)
-
------------
-
-# Errors
-Some known errors and their solutions can be found [here](https://github.com/Anonym0usWork1221/android-memorytool/blob/main/ERRORS.md)   
-
------------
-
-Supported Data Types
+Supported Data Types (For all Linux, Android and Windows)
 -------------------
 
 All data types are signed.
 
-| **Range**                                               | **Name** | **Type**         |
-|---------------------------------------------------------|----------|------------------|
-| -2,147,483,648 to 2,147,483,647                         | DWORD    | signed int       |
-| 3.4E +/- 38 (7 digits)                                  | FLOAT    | float            |
-| 1.7E +/- 308 (15 digits)                                | DOUBLE   | double           |
-| -32,768 to 32,767                                       | WORD     | signed short int |
-| -128 to 127                                             | BYTE     | signed char      |
-| -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807 | QWORD    | signed long long |
-| -2,147,483,648 to 2,147,483,647                         | XOR      | signed long      |
-| Random                                                  | UTF_8    | Text             |
-| Random                                                  | UTF_16LE | Text             |
+| **Range**                                               | **Name** | **Type**         | **Bytes** |
+|---------------------------------------------------------|----------|------------------|-----------|
+| -2,147,483,648 to 2,147,483,647                         | DWORD    | signed int       | 4         |
+| 3.4E +/- 38 (7 digits)                                  | FLOAT    | float            | 4         |
+| 1.7E +/- 308 (15 digits)                                | DOUBLE   | double           | 8         |
+| -32,768 to 32,767                                       | WORD     | signed short int | 2         |
+| -128 to 127                                             | BYTE     | signed char      | 1         |
+| -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807 | QWORD    | signed long long | 8         |
+| -2,147,483,648 to 2,147,483,647                         | XOR      | signed long      | 4         |
+| Random                                                  | UTF_8    | char[]           | Random    |
+| Random                                                  | UTF_16LE | char[]           | Random    |
 
 
 
-Supported Map Ranges
+Supported Map Ranges (Linux and Android only)
 --------------------
 | **Script Name** | **Name**     | **Description**                        |
 |-----------------|--------------|----------------------------------------|
@@ -412,22 +481,24 @@ Supported Map Ranges
 </a>
 
 -----------
-
-Assistance
+Support and Contact Information
 ----------
-If you need assistance, you can ask for help on my mailing list:
+> If you require any assistance or have questions, please feel free to reach out to me through the following channels:  
+* **Email**: `abdulmoez123456789@gmail.com`
 
-* Email      : abdulmoez123456789@gmail.com
+> I have also established a dedicated Discord group for more interactive communication:  
+* **Discord Server**: `https://discord.gg/RMNcqzmt9f`
 
-I also created a Discord group:
-
-* Server     : https://discord.gg/RMNcqzmt9f
 
 -----------
 
 Buy Me a coffee
 --------------
-If you want to support me you can buy me coffee.
+__If you'd like to show your support and appreciation for my work, you can buy me a coffee using the 
+following payment option:__
 
-BTC: ``` 19vwfRXfthPY7f2aqDBpxQvZa6AJFKcdBS ```
+**Payoneer**: `abdulmoez123456789@gmail.com`
+
+> Your support is greatly appreciated and helps me continue providing valuable assistance and resources. 
+Thank you for your consideration.
 

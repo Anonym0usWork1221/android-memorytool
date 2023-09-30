@@ -1,10 +1,17 @@
 """
- *  date   : 2023/07/11
- *  Version : 0.5
- *  author : Abdul Moez (abdulmoez123456789@gmail.com)
- *  Study  : UnderGraduate in GCU Lahore, Pakistan
- *  https://github.com/Anonym0usWork1221/android-memorytool
-
+/*
+ *  Date     : 2023/09/30
+ *  Version  : 0.6
+ *  Author   : Abdul Moez
+ *  Email    : abdulmoez123456789@gmail.com
+ *  Affiliation : Undergraduate at Government College University (GCU) Lahore, Pakistan
+ *  GitHub   : https://github.com/Anonym0usWork1221/android-memorytool
+ *
+ *  Description:
+ *  This code is governed by the GNU General Public License, version 3 or later.
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 """
 
 # !/usr/bin/env python
@@ -24,7 +31,8 @@ class AndroidMemoryToolCLI:
 
         self._android_memory_tool = android_tool
 
-    def _get_data_type(self, user_type):
+    @staticmethod
+    def _get_data_type(user_type):
         """
             Get the data type based on the user input.
 
@@ -39,15 +47,15 @@ class AndroidMemoryToolCLI:
         """
 
         data_types = {
-            "DWORD": self._android_memory_tool.DataTypes.DWORD,
-            "FLOAT": self._android_memory_tool.DataTypes.FLOAT,
-            "DOUBLE": self._android_memory_tool.DataTypes.DOUBLE,
-            "WORD": self._android_memory_tool.DataTypes.WORD,
-            "BYTE": self._android_memory_tool.DataTypes.BYTE,
-            "QWORD": self._android_memory_tool.DataTypes.QWORD,
-            "XOR": self._android_memory_tool.DataTypes.XOR,
-            "UTF_8": self._android_memory_tool.DataTypes.UTF_8,
-            "UTF_16LE": self._android_memory_tool.DataTypes.UTF_16LE
+            "DWORD": "DWORD",
+            "FLOAT": "FLOAT",
+            "DOUBLE": "DOUBLE",
+            "WORD": "WORD",
+            "BYTE": "BYTE",
+            "QWORD": "QWORD",
+            "XOR": "XOR",
+            "UTF_8": "UTF_8",
+            "UTF_16LE": "UTF_16LE"
         }
         if user_type in data_types:
             return data_types[user_type]
@@ -187,8 +195,8 @@ class AndroidMemoryToolCLI:
             Prints:
                 The base address of the module.
         """
-
-        pid = self._android_memory_tool.get_pid(args.pid)
+        tool = self._android_memory_tool(PKG=args.pid)
+        pid = tool.get_pid()
         result = self._android_memory_tool.get_module_base_address(pid, args.module_name)
         if result is not None:
             print(f"Base address: {result}")
@@ -270,9 +278,10 @@ class AndroidMemoryToolCLI:
                 The PID of the process.
         """
 
-        tool = self._android_memory_tool.get_pid(args.pkg)
+        tool = self._android_memory_tool(PKG=args.pkg)
+        pid = tool.get_pid()
         if tool:
-            print(f"Pid of process: {tool}")
+            print(f"Pid of process: {pid}")
 
     def get_version(self):
         """
@@ -498,8 +507,8 @@ class AndroidMemoryToolCLI:
             elif args.command == "find_and_replace_hex_pattern":
                 print("Command: find_and_replace_hex_pattern")
                 print("Description: Find and replace a hexadecimal pattern in memory")
-                print(
-                    "Usage: find_and_replace_hex_pattern <pkg> <type> <speed_mode> <workers> <search_pattern> <replace_pattern>")
+                print("Usage: find_and_replace_hex_pattern <pkg> <type> <speed_mode> <workers> "
+                      "<search_pattern> <replace_pattern>")
                 print("\nParameters:")
                 print("  <pkg>             Package name or PID")
                 print("  <type>            Data type")

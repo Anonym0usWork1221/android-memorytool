@@ -1,476 +1,543 @@
 """
- *  date   : 2023/07/11
- *  Version : 0.5
- *  author : Abdul Moez (abdulmoez123456789@gmail.com)
- *  Study  : UnderGraduate in GCU Lahore, Pakistan
- *  https://github.com/Anonym0usWork1221/android-memorytool
-
+/*
+ *  Date     : 2023/09/30
+ *  Version  : 0.6
+ *  Author   : Abdul Moez
+ *  Email    : abdulmoez123456789@gmail.com
+ *  Affiliation : Undergraduate at Government College University (GCU) Lahore, Pakistan
+ *  GitHub   : https://github.com/Anonym0usWork1221/android-memorytool
+ *
+ *  Description:
+ *  This code is governed by the GNU General Public License, version 3 or later.
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 """
 
-# ! /usr/bin/env python
-from .additional_features import AdditionalFeatures
-from .ThreadingController import FastSearchAlgo
-from .libs_read_writers import LibsControllers
-from .mapping import Mapping
+from .WindowsAPI.android_memory_tool_windows import AndroidMemoryToolWindows
+from .LinuxAPI.android_memory_tool_linux import AndroidMemoryToolLinux
+from .CommonAPI.cross_platform_memory_profiler import MemoryProfiler
+from .LinuxAPI.DataClasses import DataClasses
+from .errors_class import PIDException
+from subprocess import check_output
+from dataclasses import dataclass
+import platform
+import psutil
+
+if platform.system() == 'Windows':
+    _WIN_PLATFORM = True
+else:
+    # Assuming that the platforms are in list[Linux, Android] other platform will give errors.
+    _WIN_PLATFORM = False
 
 
-class AndroidMemoryTool(FastSearchAlgo):
+@dataclass()
+class PMAP(DataClasses.PMAP):
     """
-    This class represents a tool for performing memory-related operations on an Android device. It inherits from the FastSearchAlgo class.
+    Data class that defines different options for memory mapping.
 
-    Constructor:
+    Inherited-Attributes:
+        ALL (bool, optional): True to search for memory attributes in all regions, False to search in MAIN only.
+        B_BAD (bool, optional): True to search for BAD regions in memory.
+        C_ALLOC (bool, optional): True to search for C_ALLOC regions in memory.
+        C_BSS (bool, optional): True to search for C_BSS regions in memory.
+        C_DATA (bool, optional): True to search for C_DATA regions in memory.
+        C_HEAP (bool, optional): True to search for C_HEAP regions in memory.
+        JAVA_HEAP (bool, optional): True to search for JAVA_HEAP regions in memory.
+        A_ANONYMOUS (bool, optional): True to search for A_ANONYMOUS regions in memory.
+        CODE_SYSTEM (bool, optional): True to search for CODE_SYSTEM regions in memory.
+        STACK (bool, optional): True to search for STACK regions in memory.
+        ASHMEM (bool, optional): True to search for ASHMEM regions in memory.
+        J_Java (bool, optional): True to search for J_Java regions in memory.
+        CODE_APP (bool, optional): True to search for CODE_APP regions in memory.
+        V_video (bool, optional): True to search for V_video regions in memory.
+    """
+    ...
 
-    __init__(self, PKG: any((str, int)), TYPE=FastSearchAlgo.DataTypes.DWORD, SPEED_MODE=True, WORKERS=50,
-             pMAP=FastSearchAlgo.PMAP()) -> None:
-             Initializes an instance of the AndroidMemoryTool class. It takes the following parameters:
-    PKG: Package name or ID of the target process.
-    TYPE: Data type to be used in memory operations (default: FastSearchAlgo.DataTypes.DWORD).
-    SPEED_MODE: Flag indicating whether speed mode is enabled (default: True).
-    WORKERS: Number of worker threads to use in search operations (default: 50).
-    pMAP: Instance of the PMAP class for memory mapping (default: FastSearchAlgo.PMAP()).
 
-    Methods:
+@dataclass()
+class DataTypes(DataClasses.DataTypes):
+    """
+    Data class that defines different data types used in the code.
 
-    initialize(self, PKG: any((str, int)), TYPE: str, SPEED_MODE: bool,
-               WORKERS: int, pMAP: FastSearchAlgo.PMAP) -> None:
-               Initializes the AndroidMemoryTool instance with the specified parameters.
+    Inherited-Attributes:
+        DWORD (str): 32-bit data type.
+        FLOAT (str): 32-bit floating-point data type.
+        DOUBLE (str): 64-bit floating-point data type.
+        WORD (str): 16-bit data type.
+        BYTE (str): 8-bit data type.
+        QWORD (str): 64-bit data type.
+        XOR (str): XOR data type.
+        UTF_8 (str): UTF-8 character encoding.
+        UTF_16LE (str): UTF-16LE character encoding.
+    """
+    ...
 
-    read_value(self, read: any) -> any: Reads the value at a given memory address. It takes the following parameter:
-    read: Memory address to read from.
 
-    read_write_value(self, read: any, write: any) -> any:
-                     Reads the value at a given memory address and then writes a new value to that address.
-                      It takes the following parameters:
-    read: Memory address to read from.
-    write: Value to write to the memory address.
+class AndroidMemoryTool(object):
+    """
+        Android Memory Tool for reading, writing, and analyzing memory of Android applications and processes.
 
-    write_lib(self, base_address: hex, offset: hex, write_value: any) -> any:
-              Writes a value to a specific offset in a shared library. It takes the following parameters:
-    base_address: Base address of the shared library.
-    offset: Offset within the shared library.
-    write_value: Value to write to the specified offset.
+        Attributes:
+            VERSION_CODE (float): The version code of the AndroidMemoryTool.
+            DEVELOPER (str): The name of the developer of AndroidMemoryTool.
+            PLATFORM (str): The platform the script is running on (Linux, Android, Windows).
 
-    read_lib(self, base_address: hex, offset: hex, value: any((str, int, None)) = None) -> any:
-             Reads a value from a specific offset in a shared library. It takes the following parameters:
-    base_address: Base address of the shared library.
-    offset: Offset within the shared library.
-    value (optional): Value to use for dynamic buffer size calculation (default: None).
+        Args:
+            PKG (str or int): The package name or PID of the target Android application.
+            TYPE (str): The data type for memory operations (default is DWORD).
+            SPEED_MODE (bool): Enable speed mode for memory operations (default is False).
+            WORKERS (int): The number of worker processes for parallel memory operations (default is half of CPU cores).
+            pMAP (PMAP): Process Memory Attributes object to specify memory search attributes (default is empty PMAP).
 
-    refiner_address(self, list_address: list, value_to_refine: any) -> any:
-                Refines a list of memory addresses based on a specific value. It takes the following parameters:
-    list_address: List of memory addresses to refine.
-    value_to_refine: Value to refine the addresses based on.
+        Raises:
+            PIDException: If the specified process is not running in memory.
 
-    get_module_base_address(pid: str, module_name: str) -> any:
-                    Retrieves the base address of a specific module within a process. It takes the following parameters:
-    pid: Process ID.
-    module_name: Name of the module.
-
-    raw_dump(self, lib_name: str, path='./') -> bool:
-             Dumps the raw binary contents of a shared library. It takes the following parameters:
-    lib_name: Name of the shared library.
-    path (optional): Path to save the binary dump (default: './').
-
-    find_hex_pattern(self, hex_pattern: str) -> any:
-            Searches for a hexadecimal pattern in the memory of the target process. It takes the following parameter:
-    hex_pattern: Hexadecimal pattern to search for.
-
-    dump_maps(self, path="./") -> bool:
-        Dumps the memory mapping information of the target process to a file. It takes the following parameter:
-    path (optional): Path to save the memory mapping file (default: './').
+        Example:
+            To initialize AndroidMemoryTool and obtain the Process ID (PID) of a target process:
+            ```python
+            from androidMemoryTool import AndroidMemoryTool
+            tool = AndroidMemoryTool(PKG="ac_client")
+            pid = tool.get_pid()
+            print(pid)
+            ```
 
     """
-    VERSION_CODE = 0.5
+    VERSION_CODE = 0.6
     DEVELOPER = "Abdul Moez"
-    _LibControllerObject = LibsControllers()
+    PLATFORM = platform.system()
 
-    def __init__(self, PKG: any((str, int)), TYPE=FastSearchAlgo.DataTypes.DWORD, SPEED_MODE=True, WORKERS=50,
-                 pMAP=FastSearchAlgo.PMAP()) -> None:
+    def __init__(self, PKG: any((str, int)),
+                 TYPE: str = DataTypes.DWORD,
+                 SPEED_MODE: bool = False,
+                 WORKERS: int = int(psutil.cpu_count() / 2),  # half of cores available in operating system
+                 pMAP: PMAP = PMAP()
+                 ) -> None:
         """
-            Initializes an instance of the AndroidMemoryTool class. It takes the following parameters:
-        Args:
-            PKG: Package name or ID of the target process.
-            TYPE: Data type to be used in memory operations (default: FastSearchAlgo.DataTypes.DWORD).
-            SPEED_MODE: Flag indicating whether speed mode is enabled (default: True).
-            WORKERS: Number of worker threads to use in search operations (default: 50).
-            pMAP: Instance of the PMAP class for memory mapping (default: FastSearchAlgo.PMAP()).
-        """
-        super(AndroidMemoryTool, self).__init__()
-        self.initialize(PKG, TYPE, SPEED_MODE, WORKERS, pMAP)
-
-    def initialize(self, PKG: any((str, int)), TYPE: str, SPEED_MODE: bool, WORKERS: int,
-                   pMAP: FastSearchAlgo.PMAP) -> None:
-        """
-        Initializes the AndroidMemoryTool object.
+        Initialize AndroidMemoryTool with specified parameters.
 
         Args:
-            PKG: The package name or process ID.
-            TYPE: The data type to search for. Defaults to FastSearchAlgo.DataTypes.DWORD.
-            SPEED_MODE: Whether to enable speed mode. Defaults to True.
-            WORKERS: The number of workers to use for searching. Defaults to 50.
-            pMAP: The memory map to use. Defaults to FastSearchAlgo.PMAP().
+            PKG (str or int): The package name or PID of the target Android application.
+            TYPE (str): The data type for memory operations (default is DWORD).
+            SPEED_MODE (bool): Enable speed mode for memory operations (default is False).
+            WORKERS (int): The number of worker processes for parallel memory operations (default is half of CPU cores).
+            pMAP (PMAP): Process Memory Attributes object to specify memory search attributes (default is empty PMAP).
+
+        Returns:
+            None
+
+        Example:
+            To initialize AndroidMemoryTool with custom parameters:
+            ```python
+            tool = AndroidMemoryTool(PKG="ac_client", TYPE=DataTypes.WORD, SPEED_MODE=True, WORKERS=4)
+            ```
         """
 
-        super().init_setup(PKG, TYPE, SPEED_MODE, WORKERS)
-        super().init_tool(pMAP)
+        self._pkg_name = PKG
+        if _WIN_PLATFORM:
+            # PMAP is not supported in Windows API
+            self._current_instance = AndroidMemoryToolWindows(PKG=PKG, TYPE=TYPE, SPEED_MODE=SPEED_MODE,
+                                                              WORKERS=WORKERS)
+        else:
+            self._current_instance = AndroidMemoryToolLinux(PKG=PKG,
+                                                            TYPE=TYPE,
+                                                            SPEED_MODE=SPEED_MODE,
+                                                            WORKERS=WORKERS,
+                                                            pMAP=pMAP)
+
+    def __repr__(self) -> str:
+        """
+        Return a string representation of the AndroidMemoryTool instance.
+
+        Returns:
+            str: A string containing the class name and the target package name or PID.
+
+        Example:
+            ```python
+            tool = AndroidMemoryTool(PKG="ac_client")
+            print(tool)  # Output: "AndroidMemoryTool: 'ac_client'"
+            ```
+        """
+
+        return f'{self.__class__.__name__}: "{self._pkg_name}"'
 
     @staticmethod
-    def get_version_code():
+    def get_version_code() -> float:
+        """
+        Get the version code of AndroidMemoryTool.
+
+        Returns:
+            float: The version code.
+
+        Example:
+            ```python
+            version = AndroidMemoryTool.get_version_code()
+            print(version)
+            ```
+        """
         return AndroidMemoryTool.VERSION_CODE
 
     @staticmethod
-    def get_developer():
+    def get_cpu_counts(fraction: int = None) -> int:
+        """
+        Get the number of CPU cores available on the device.
+
+        Args:
+            fraction (int, optional): If specified, returns a fraction of available CPU cores (default is None).
+
+        Returns:
+            int: The number of CPU cores.
+
+        Example:
+            ```python
+            cores = AndroidMemoryTool.get_cpu_counts()
+            print(cores)
+
+            # Get half of available CPU cores
+            half_cores = AndroidMemoryTool.get_cpu_counts(fraction=2)
+            print(half_cores)
+            ```
+        """
+
+        if fraction:
+            return int(psutil.cpu_count() / fraction)
+        return psutil.cpu_count()
+
+    @staticmethod
+    def get_developer() -> str:
+        """
+        Get the name of the developer of AndroidMemoryTool.
+
+        Returns:
+            str: The developer's name.
+
+        Example:
+            ```python
+            developer = AndroidMemoryTool.get_developer()
+            print(developer)
+            ```
+        """
+
         return AndroidMemoryTool.DEVELOPER
 
-    def read_value(self, read: any) -> any:
+    @staticmethod
+    def get_platform(verbose: bool = False) -> str:
         """
-        Reads the value from the specified memory address.
+        Get the platform the script is running on (Linux, Android, Windows).
 
         Args:
-            read: The memory address to read from.
+            verbose (bool, optional): If True, print a message for unsupported platforms (default is False).
 
         Returns:
-            The value read from the memory address.
+            str: The platform name.
+
+        Example:
+            ```python
+            platform_name = AndroidMemoryTool.get_platform(verbose=True)
+            print(platform_name)
+            ```
         """
 
-        # gets if speed mode is on or off
-        speed_mode = super().get_variables(is_speed=True)
-        # gets data type bytes in int
-        data_types = super().get_variables(is_data_byte=True)
-        # gets PID of running process
-        proc_id = super().get_variables(is_pid=True)
+        if platform.system() == 'Windows':
+            return "Windows"
+        elif platform.system() == 'Linux':
+            return 'Linux'
+        elif check_output(['uname', '-o']).strip() == b'Android':
+            return 'Android'
+        else:
+            if verbose:
+                print('[DEBUG] This platform is not currently supported by AndroidMemoryTool')
+            return platform.system()
 
-        if proc_id == '':
-            print('[*] Pid not found')
-            return None
-
-        # If data type is valid continue
-        if data_types != -1:
-            maps_addr = super().get_variables(is_map_addr=True)
-            value_to_read = super().data_type_encoding(read)
-
-            if data_types == 0:
-                if speed_mode:
-                    super().fast_search_algorithms_text(proc_id, maps_addr, value_to_read)
-                    value = self._SearchAndReadObject.get_readers_values()
-                    self._SearchAndReadObject.reset_queue()
-                    return value
-
-                return self._SearchAndReadObject.search_and_read_text(proc_id, maps_addr, value_to_read)
-            else:
-                if speed_mode:
-                    super().fast_search_algorithms_value(proc_id, maps_addr, value_to_read,
-                                                         data_types)
-                    value = self._SearchAndReadObject.get_readers_values()
-                    self._SearchAndReadObject.reset_queue()
-                    return value
-
-                return self._SearchAndReadObject.search_and_read(proc_id, maps_addr, data_types, value_to_read)
-
-        return None
-
-    def read_write_value(self, read: any, write: any) -> any:
+    @staticmethod
+    def is_root_acquired() -> bool:
         """
-        Reads the value from the specified memory address and writes the new value to it.
+        Check if the script is running with root/administrator privileges.
+
+        Returns:
+            bool: True if running with root/admin privileges, False otherwise.
+
+        Example:
+            ```python
+            is_root = AndroidMemoryTool.is_root_acquired()
+            print(is_root)
+            ```
+        """
+
+        if _WIN_PLATFORM:
+            import ctypes
+            return True if ctypes.windll.shell32.IsUserAnAdmin() == 1 else False
+        from os import getuid
+        return True if getuid() == 0 else False
+
+    def read_value(self, read: any, is_grouped: bool = False, range_val: int = 512) -> any:
+        """
+        Search and read a value or values from memory.
 
         Args:
-            read: The memory address to read from.
-            write: The new value to write.
+            read (any): The value or values to search for in memory.
+            is_grouped (bool, optional): True to group search results, False to return individual results
+                                         (default is False).
+            range_val (int, optional): The maximum range for memory search (default is 512).
 
         Returns:
-            The value written to the memory address.
+            any: The value or values found in memory.
+
+        Example:
+            ```python
+            values = tool.read_value(100)
+            founded_offsets = values[0]
+            founded_values = values[1]
+            print(founded_values)
+            print(founded_offsets)
+            ```
         """
 
-        speed_mode = super().get_variables(is_speed=True)
-        data_types = super().get_variables(is_data_byte=True)
-        proc_id = super().get_variables(is_pid=True)
+        # Note: Group search is not available for string data-types
+        return self._current_instance.read_value(read=read, is_grouped=is_grouped, range_val=range_val)
 
-        if proc_id == '':
-            print('[*] Pid not found')
-            return None
+    def read_write_value(self, read: any, write: any, is_grouped: bool = False, range_val: int = 552) -> any:
+        """
+        Search, read, and optionally write a value or values in memory.
 
-        if data_types != -1:
-            maps_addr = super().get_variables(is_map_addr=True)
-            value_to_read, value_to_write = super().data_type_encoding(read, write)
+        Args:
+            read (any): The value or values to search for in memory.
+            write (any): The value to replace the found value(s) with.
+            is_grouped (bool, optional): True to group search results, False to return individual results
+                                         (default is False).
+            range_val (int, optional): The maximum range for memory search (default is 552).
 
-            if data_types == 0:
-                if speed_mode:
-                    super().fast_search_algorithms_text(proc_id, maps_addr, value_to_read, value_to_write)
-                    value = self._SearchAndWriteObject.get_writer_values()
-                    self._SearchAndWriteObject.reset_queue()
-                    return value
+        Returns:
+            any: The value or values found in memory.
 
-                return self._SearchAndWriteObject.search_and_write_text(proc_id, maps_addr, value_to_read,
-                                                                        value_to_write)
-            else:
-                if speed_mode:
-                    super().fast_search_algorithms_value(proc_id, maps_addr, value_to_read,
-                                                         data_types, value_to_write)
-                    value = self._SearchAndWriteObject.get_writer_values()
-                    self._SearchAndWriteObject.reset_queue()
-                    return value
+        Example:
+            ```python
+            values1 = tool.read_write_value(100, 10)
+            print(values1)
+            ```
+        """
 
-                return self._SearchAndWriteObject.search_and_write(proc_id, maps_addr, data_types, value_to_read,
-                                                                   value_to_write)
-        return None
+        # Note: Group search is not available for string data-types
+        return self._current_instance.read_write_value(read=read, write=write, is_grouped=is_grouped,
+                                                       range_val=range_val)
 
     def write_lib(self, base_address: str, offset: str, write_value: any) -> any:
         """
-        Writes the value to the specified library offset.
+        Write a value to a specific memory address.
 
         Args:
-            base_address: The base address of the library.
-            offset: The offset within the library.
-            write_value: The value to write.
+            base_address (str): The base address in hexadecimal format.
+            offset (str): The offset in hexadecimal format.
+            write_value (any): The value to write to the specified memory address.
 
         Returns:
-            The value written to the library offset.
+            any: The result of the write operation.
+
+        Example:
+            ```python
+            values1 = tool.write_lib(base_address='0x12345678', offset='0x100', write_value=42)
+            print(values1)
+            ```
         """
 
-        data_types = super().get_variables(is_data_byte=True)
-        proc_id = super().get_variables(is_pid=True)
-        base_address = str(base_address)
-        offset = str(offset)
+        return self._current_instance.write_lib(base_address=base_address, offset=offset, write_value=write_value)
 
-        if proc_id == '':
-            print('[*] Pid not found')
-            return None
-
-        if data_types != -1:
-            value_to_write = super().data_type_encoding(write_value)
-            return self._LibControllerObject.write_lib_offsets(proc_id, base_address, offset, value_to_write)
-        return None
-
-    def read_lib(self, base_address: str, offset: str, value:  any((str, int, None)) = None) -> any:
+    def read_lib(self, base_address: str, offset: str, value: any((str, int, None)) = None) -> any:
         """
-        Reads the value from the specified library offset.
+        Read a value from a specific memory address.
 
         Args:
-            base_address: The base address of the library.
-            offset: The offset within the library.
-            value: The additional value parameter for certain data types. Defaults to None.
+            base_address (str): The base address in hexadecimal format.
+            offset (str): The offset in hexadecimal format.
+            value (any, optional): A value to compare against the read value (default is None).
 
         Returns:
-            The value read from the library offset.
+            any: The value read from the specified memory address.
+
+        Example:
+            ```python
+            values1 = tool.read_lib(base_address='0x12345678', offset='0x100', value=None)
+            print(values1)
+            ```
         """
 
-        data_types = super().get_variables(is_data_byte=True)
-        proc_id = super().get_variables(is_pid=True)
-        base_address = str(base_address)
-        offset = str(offset)
-
-        if proc_id == '':
-            print('[*] Pid not found')
-            return None
-
-        if data_types != -1:
-            if data_types == 0:
-                if value is None:
-                    print("[*] Needed Value parameter")
-                    return None
-
-                if isinstance(value, int):
-                    buffer = 18 + (2 * int(value))
-                elif str(value).isnumeric():
-                    buffer = 18 + (2 * int(str(value)))
-                else:
-                    buffer = 18 + (2 * int(len(str(value))))
-
-                value = self._LibControllerObject.read_lib_offsets(proc_id, base_address, offset, buffer)
-                if value:
-                    return super().data_type_decoding(value)
-
-            else:
-                value = self._LibControllerObject.read_lib_offsets(proc_id, base_address, offset, data_types)
-                if value:
-                    return super().data_type_decoding(value)
-        return None
+        return self._current_instance.read_lib(base_address=base_address, offset=offset, value=value)
 
     def refiner_address(self, list_address: list, value_to_refine: any) -> any:
         """
-        Refines the list of addresses based on the specified value to refine.
+        Refine a list of memory addresses based on a specific value.
 
         Args:
-            list_address: The list of addresses to refine.
-            value_to_refine: The value to refine.
+            list_address (list): A list of memory addresses.
+            value_to_refine (any): The value to refine the addresses against.
 
         Returns:
-            The refined list of addresses.
+            any: The refined list of memory addresses.
+
+        Example:
+            ```python
+            values = tool.read_value(100)
+            founded_offsets = values[0]
+            refined_address = tool.refiner_address(list_address=founded_offsets, value_to_refine=50)
+            print(refined_address)
+            ```
         """
 
-        proc_id = super().get_variables(is_pid=True)
-        data_types = super().get_variables(is_data_byte=True)
-        value_to_read = super().data_type_encoding(value_to_refine)
+        return self._current_instance.refiner_address(list_address=list_address, value_to_refine=value_to_refine)
 
-        if proc_id == '':
-            print('[*] Pid not found')
-            return None
-
-        if data_types != -1:
-            if data_types == 0:
-                print("[*] Data type not supported")
-            else:
-                return self._LibControllerObject.address_refiners(proc_id, list_address, data_types, value_to_read)
-        return None
-
-    @staticmethod
-    def get_module_base_address(pid: str, module_name: str) -> any:
+    def get_module_base_address(self, module_name: str) -> any:
         """
-        Gets the base address of the specified module for the given process ID.
+        Get the base address of a specific module in the target process.
 
         Args:
-            pid: The process ID.
-            module_name: The name of the module.
+            module_name (str): The name of the module to retrieve the base address of.
 
         Returns:
-            The base address of the module.
+            any: The base address of the module.
+
+        Example:
+            ```python
+            base_addr = tool.get_module_base_address("client.so")
+            print(base_addr)
+            ```
         """
 
-        map_file = open(f"/proc/{pid}/maps", 'r')
-        address = []
-        if map_file is not None:
-            for line in map_file.readlines():
-                line_split = line.split()
-                if module_name in line_split[len(line_split) - 1]:
-                    address.append(line_split[0].split('-'))
-        if len(address) < 1:
-            print("[*] Module not found")
-            return None
-        base_address = hex(int(address[0][0], 16))
-        return base_address
+        return self._current_instance.get_module_base_address(module_name=module_name)
 
     def raw_dump(self, lib_name: str, path='./') -> bool:
         """
-        Dumps the specified library to a raw binary file.
+        Dump the memory of a process to a file.
 
         Args:
-            lib_name: The name of the library.
-            path: The path to save the dumped file. Defaults to './'.
+            lib_name (str): The name of the library to dump.
+            path (str, optional): The path to save the dump file (default is './').
 
         Returns:
-            True if the dump was successful, False otherwise.
+            bool: True if the dump was successful, False otherwise.
+
+        Example:
+            ```python
+            dump = tool.raw_dump(lib_name='client.so', path='./')
+            print(dump)
+            ```
         """
 
-        proc_id = super().get_variables(is_pid=True)
-
-        if "-" in lib_name:
-            address = lib_name.split("-")
-        else:
-            address = Mapping.mapping_dump_libs(proc_id, lib_name)
-
-        if len(address) < 1:
-            print("[*] Module not found")
-            return False
-
-        binary_string = self._LibControllerObject.raw_dumper(proc_id, address)
-        open(f"{path}{address[0][0]}-{address[len(address) - 1][1]}-{lib_name.replace('.so', '')}.bin", 'wb') \
-            .write(binary_string)
-        return True
+        return self._current_instance.raw_dump(lib_name=lib_name, path=path)
 
     def find_hex_pattern(self, search_pattern: str) -> any:
         """
-        Finds the specified hexadecimal pattern in the memory.
+        Find hex patterns in memory (Linux and Android only).
 
         Args:
-            search_pattern: The hexadecimal pattern to search for.
+            search_pattern (str): The hex pattern to search for.
 
         Returns:
-            The addresses where the pattern was found.
+            any: A tuple containing found addresses, total patterns found, and found values.
+
+        Example:
+            ```python
+            found_pattern = tool.find_hex_pattern("87 ?? 2B")
+            for index in range(0, len(found_pattern[0])):
+                print(f"{found_pattern[0][index]}: {found_pattern[2][index]}")
+            print(f"Total Pattern found: {found_pattern[1]}")
+            ```
         """
 
-        proc_id = super().get_variables(is_pid=True)
-        maps_addr = super().get_variables(is_map_addr=True)
-        speed_mode = super().get_variables(is_speed=True)
-
-        filter_user_data = search_pattern.replace(" ", "")
-        bytes_of_filtered_data = int(len(filter_user_data) / 2)
-        pattern_of_hex = ""
-        character_counter_hex = 0
-        for char in filter_user_data:
-            if char == "?":
-                character_counter_hex += 1
-            else:
-                if character_counter_hex != 0:
-                    pattern_of_hex += f"[A-Fa-f0-9]{{{character_counter_hex}}}"
-                    character_counter_hex = 0
-                if char != "?":
-                    pattern_of_hex += char
-
-        if character_counter_hex != 0:
-            pattern_of_hex += f"[A-Fa-f0-9]{{{character_counter_hex}}}"
-        if speed_mode:
-            super().fast_search_algorithms_pattern_finding(proc_id, maps_addr, bytes_of_filtered_data,
-                                                           pattern_of_hex)
-            values = self._AdditionalFeaturesObject.get_pattern_finder_values()
-            self._AdditionalFeaturesObject.reset_queue()
-            return values
-
-        return AdditionalFeatures.find_hexadecimal_pattern(proc_id, maps_addr, bytes_of_filtered_data, pattern_of_hex)
+        # Note: Not available for Windows API in this version
+        return self._current_instance.find_hex_pattern(search_pattern=search_pattern)
 
     def find_and_replace_hex_pattern(self, search_pattern: str, replace_pattern: str) -> any:
         """
-            Finds and replaces a hexadecimal pattern in memory addresses.
+        Find and replace hex patterns in memory (Linux and Android only).
 
-            Args:
-                search_pattern (str): The pattern to search for. It can contain hexadecimal digits (0-9, A-F)
-                 and '?' as a wildcard for any single hexadecimal digit.
-                replace_pattern (str): The pattern to replace the found pattern with.
-                 It should be a valid hexadecimal string.
+        Args:
+            search_pattern (str): The hex pattern to search for.
+            replace_pattern (str): The hex pattern to replace with.
 
-            Returns:
-                any: The result of the pattern finding and replacement operation.
-                 The format of the result depends on the 'speed_mode' setting.
+        Returns:
+            any: A tuple containing found addresses, total patterns found, and found values.
+
+        Example:
+            ```python
+            found_pattern = tool.find_and_replace_hex_pattern("87 ?? 2B", "87 1D 2B")
+            for index in range(0, len(found_pattern[0])):
+                print(f"{found_pattern[0][index]}: {found_pattern[2][index]}")
+            print(f"Total Pattern found and replaced: {found_pattern[1]}")
+            ```
         """
 
-        proc_id = super().get_variables(is_pid=True)
-        maps_addr = super().get_variables(is_map_addr=True)
-        speed_mode = super().get_variables(is_speed=True)
-
-        filter_user_data = search_pattern.replace(" ", "")
-        replace_pattern = replace_pattern.replace(" ", "")
-        bytes_of_filtered_data = int(len(filter_user_data) / 2)
-        pattern_of_hex = ""
-        character_counter_hex = 0
-        for char in filter_user_data:
-            if char == "?":
-                character_counter_hex += 1
-            else:
-                if character_counter_hex != 0:
-                    pattern_of_hex += f"[A-F0-9]{{{character_counter_hex}}}"
-                    character_counter_hex = 0
-                if char != "?":
-                    pattern_of_hex += char
-
-        if character_counter_hex != 0:
-            pattern_of_hex += f"[A-F0-9]{{{character_counter_hex}}}"
-
-        if speed_mode:
-            super().fast_search_algorithms_pattern_finding(proc_id, maps_addr, bytes_of_filtered_data,
-                                                           pattern_of_hex, replace_pattern)
-            values = self._AdditionalFeaturesObject.get_pattern_finder_values()
-            self._AdditionalFeaturesObject.reset_queue()
-            return values
-
-        return AdditionalFeatures.find_and_replace_hexadecimal_pattern(proc_id, maps_addr,
-                                                                       bytes_of_filtered_data, pattern_of_hex,
-                                                                       replace_pattern)
+        # Note: Not available for Windows API in this version
+        return self._current_instance.find_and_replace_hex_pattern(search_pattern=search_pattern,
+                                                                   replace_pattern=replace_pattern)
 
     def dump_maps(self, path="./") -> bool:
         """
-        Dumps the memory maps of the process.
+        Dump the memory maps of a process to a file.
 
         Args:
-            path: The path to save the dumped file. Defaults to './'.
+            path (str, optional): The path to save the memory maps dump file (default is './').
 
         Returns:
-            True if the dump was successful, False otherwise.
+            bool: True if the dump was successful, False otherwise.
+
+        Example:
+            ```python
+            is_dumped = tool.dump_maps(path="./")
+            print(is_dumped)
+            ```
         """
 
-        proc_id = super().get_variables(is_pid=True)
-        if proc_id:
-            map_file = open(f"/proc/{proc_id}/maps", "r").read()
-            open(f"{path}Map_{proc_id}.txt", "w").write(map_file)
-            return True
+        return self._current_instance.dump_maps(path=path)
 
-        return False
+    def get_pid(self) -> int:
+        """
+        Get the Process ID (PID) of the target process.
 
+        Returns:
+            int: The PID of the process.
+
+        Raises:
+            PIDException: If the specified process is not running in memory.
+
+        Example:
+            ```python
+            pid = tool.get_pid()
+            print(pid)
+            ```
+        """
+
+        pkg = str(self._pkg_name)
+        if pkg.isnumeric():  # If the input is already a PID
+            pid = int(pkg)
+            if psutil.pid_exists(pid):
+                return int(pid)
+            else:
+                raise PIDException("Process is not running in memory. Try to restart the process and script.")
+        else:  # If the input is a package name
+            try:
+                for proc in psutil.process_iter(attrs=['pid', 'name']):
+                    if pkg.lower() in proc.info['name'].lower():
+                        return int(proc.info['pid'])
+                raise PIDException("Process is not running in memory. Try to restart the process and script.")
+            except Exception:
+                raise PIDException("Error occurred while retrieving PID for the process.")
+
+    def get_memory_profiler(self, logging_file_path: str = "memory_log.txt") -> MemoryProfiler:
+        """
+        Get a MemoryProfiler instance to analyze memory usage.
+
+        Args:
+            logging_file_path (str, optional): The path to the memory profiling log file (default is "memory_log.txt").
+
+        Returns:
+            MemoryProfiler: A MemoryProfiler instance.
+
+        Example:
+            ```python
+            memory_profiler = tool.get_memory_profiler(logging_file_path="memory_log.txt")
+            memory_profiler.start_profiling(logging=False)
+            ```
+        """
+        # Only needed PID (Initialize the MemoryTool with pid or name only)
+        pid = self.get_pid()
+        return MemoryProfiler(pid=pid, logging_file_path=logging_file_path)
