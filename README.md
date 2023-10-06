@@ -30,7 +30,7 @@ please do not hesitate to contact us. Your feedback is invaluable in our pursuit
 
  *  Date   : 2023/09/30
  *  Author : **__Abdul Moez__**
- *  Version : 0.6 (+Windows Support)
+ *  Version : 0.6.1 (Linux Pid Bug Fixed)
  *  Study  : UnderGraduate in GCU Lahore, Pakistan
  *  Repository  : [Main Branch](https://github.com/Anonym0usWork1221/android-memorytool)
  *  Documentation: [AndroidMemoryToolExtensiveDocumentation](https://github.com/Anonym0usWork1221/android-memorytool/tree/main/Documentation)
@@ -47,7 +47,7 @@ please do not hesitate to contact us. Your feedback is invaluable in our pursuit
 
 -----------
 
-# Version 0.6
+# Version 0.6.1
 
 ````
 -----------------------------------------MODIFICATION LOG--------------------------------------------------
@@ -135,7 +135,7 @@ Installation
 ----------------------------------------
 1. **Installation via Pip for Easy Integration into Your Project**  
     To effortlessly incorporate the Android Memory Tool into your project, execute the following pip command:  
-    > pip install androidMemoryTool==0.6
+    > pip install androidMemoryTool==0.6.1
 
 2. **Installation by Cloning the Repository and Running Commands**  
     Alternatively, you can acquire the Android Memory Tool by cloning the GitHub repository and executing the 
@@ -145,7 +145,7 @@ Installation
     pip install .
 
 3. **Project live at**  
-    [PyPi-0.6](https://pypi.org/project/androidMemoryTool/0.6/)
+    [PyPi-0.6](https://pypi.org/project/androidMemoryTool/0.6.1/)
 
 
 Utilize our cutting-edge Memory Tool, replete with intricate examples, readily accessible within the designated folder.
