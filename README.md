@@ -136,7 +136,7 @@ Installation
 ----------------------------------------
 1. **Installation via Pip for Easy Integration into Your Project**  
     To effortlessly incorporate the Android Memory Tool into your project, execute the following pip command:  
-    > pip install androidMemoryTool==0.6.1
+    > pip install androidMemoryTool==0.6.3
 
 2. **Installation by Cloning the Repository and Running Commands**  
     Alternatively, you can acquire the Android Memory Tool by cloning the GitHub repository and executing the 
