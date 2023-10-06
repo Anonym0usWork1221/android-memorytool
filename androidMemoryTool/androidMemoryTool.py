@@ -18,7 +18,6 @@ from .WindowsAPI.android_memory_tool_windows import AndroidMemoryToolWindows
 from .LinuxAPI.android_memory_tool_linux import AndroidMemoryToolLinux
 from .CommonAPI.cross_platform_memory_profiler import MemoryProfiler
 from .LinuxAPI.DataClasses import DataClasses
-from .errors_class import PIDException
 from subprocess import check_output
 from dataclasses import dataclass
 import platform
@@ -505,22 +504,7 @@ class AndroidMemoryTool(object):
             print(pid)
             ```
         """
-
-        pkg = str(self._pkg_name)
-        if pkg.isnumeric():  # If the input is already a PID
-            pid = int(pkg)
-            if psutil.pid_exists(pid):
-                return int(pid)
-            else:
-                raise PIDException("Process is not running in memory. Try to restart the process and script.")
-        else:  # If the input is a package name
-            try:
-                for proc in psutil.process_iter(attrs=['pid', 'name']):
-                    if pkg.lower() in proc.info['name'].lower():
-                        return int(proc.info['pid'])
-                raise PIDException("Process is not running in memory. Try to restart the process and script.")
-            except Exception:
-                raise PIDException("Error occurred while retrieving PID for the process.")
+        return int(self._current_instance.get_process_id())
 
     def get_memory_profiler(self, logging_file_path: str = "memory_log.txt") -> MemoryProfiler:
         """

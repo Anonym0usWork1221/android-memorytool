@@ -14,13 +14,13 @@
  */
 """
 
+from subprocess import check_output, CalledProcessError
 from ..errors_class import PIDException
 from dataclasses import dataclass
 from struct import pack, unpack
 from binascii import unhexlify
 from .mapping import Mapping
 from sys import byteorder
-import psutil
 
 
 class DataClasses:
@@ -84,20 +84,20 @@ class DataClasses:
         """
 
         pkg = str(pkg)
-        if pkg.isnumeric():  # If the input is already a PID
-            pid = int(pkg)
-            if psutil.pid_exists(pid):
-                return str(pid)
-            else:
-                raise PIDException("Process is not running in memory. Try to restart the process and script.")
-        else:  # If the input is a package name
+        # if the pkg is numeric string
+        if pkg.isnumeric():
             try:
-                for proc in psutil.process_iter(attrs=['pid', 'name']):
-                    if pkg.lower() in proc.info['name'].lower():
-                        return str(proc.info['pid'])
-                raise PIDException("Process is not running in memory. Try to restart the process and script.")
-            except Exception:
-                raise PIDException("Error occurred while retrieving PID for the process.")
+                pid_id = check_output(["ps", "-q", pkg, "-o", "cmd="])
+                return pkg if pid_id.decode().strip() is not None else ""
+            except CalledProcessError:
+                raise PIDException("Processes is not running in memory try to restart process and script")
+        else:
+            try:
+                pid_id = check_output(["pidof", "-s", pkg])  # gets the first id if multiple ids found
+                process_ids = pid_id.decode().strip()
+                return str(process_ids)
+            except CalledProcessError:
+                raise PIDException("Processes is not running in memory try to restart process and script")
 
     def init_setup(self, PKG: any((str, int)), TYPE: str = DataTypes.DWORD, SPEED_MODE=False, WORKERS=55) -> None:
         """

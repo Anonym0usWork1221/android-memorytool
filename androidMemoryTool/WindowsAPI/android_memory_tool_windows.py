@@ -121,6 +121,9 @@ class AndroidMemoryToolWindows(FastSearchAlgo):
         self._speed_mode = SPEED_MODE
         self._data_type = TYPE
 
+    def get_process_id(self) -> str:
+        return str(self._pid)
+
     def _get_process_by_id(self):
         """
         Get the handle of the Android application's process by its process ID.

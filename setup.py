@@ -26,7 +26,7 @@ license = (this_directory / "LICENSE.md").read_text()
 
 setup(
     name='androidMemoryTool',
-    version='0.6.1',
+    version='0.6.3',
     packages=["androidMemoryTool", "androidMemoryTool.WindowsAPI", "androidMemoryTool.LinuxAPI",
               "androidMemoryTool.CommonAPI"],
     license="GPL-3.0 license",

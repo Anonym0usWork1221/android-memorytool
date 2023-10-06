@@ -14,7 +14,7 @@ AndroidMemoryTool
 <br>
 <br>
 <p align="center">
-  <img src="assets/android_memory_tool.jpg"  title="Android Memory Tool" width="500px">
+  <img src="https://raw.githubusercontent.com/Anonym0usWork1221/android-memorytool/main/assets/android_memory_tool.jpg"  title="Android Memory Tool" width="500px">
 </p>
 
 -----------
@@ -30,7 +30,7 @@ please do not hesitate to contact us. Your feedback is invaluable in our pursuit
 
  *  Date   : 2023/09/30
  *  Author : **__Abdul Moez__**
- *  Version : 0.6.1 (Linux Pid Bug Fixed)
+ *  Version : 0.6.3 (Linux Pid Bug Fixed)
  *  Study  : UnderGraduate in GCU Lahore, Pakistan
  *  Repository  : [Main Branch](https://github.com/Anonym0usWork1221/android-memorytool)
  *  Documentation: [AndroidMemoryToolExtensiveDocumentation](https://github.com/Anonym0usWork1221/android-memorytool/tree/main/Documentation)
@@ -44,10 +44,11 @@ please do not hesitate to contact us. Your feedback is invaluable in our pursuit
 # Note
     1. This documentation is for 0.6 version (UPDATED)
     2. You can find old version on pypi if you want to use them
+    3. For Linux and Android Users use 0.6.3 Build other wise you will get PID error
 
 -----------
 
-# Version 0.6.1
+# Version 0.6.3
 
 ````
 -----------------------------------------MODIFICATION LOG--------------------------------------------------
@@ -145,7 +146,7 @@ Installation
     pip install .
 
 3. **Project live at**  
-    [PyPi-0.6](https://pypi.org/project/androidMemoryTool/0.6.1/)
+    [PyPi-0.6.3](https://pypi.org/project/androidMemoryTool/0.6.3/)
 
 
 Utilize our cutting-edge Memory Tool, replete with intricate examples, readily accessible within the designated folder.

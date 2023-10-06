@@ -507,6 +507,9 @@ class AndroidMemoryToolLinux(FastSearchAlgo):
                                                                        bytes_of_filtered_data, pattern_of_hex,
                                                                        replace_pattern)
 
+    def get_process_id(self) -> str:
+        return str(self.get_variables(is_pid=True))
+
     def dump_maps(self, path="./") -> bool:
         """
         Dumps the memory maps of the process.
