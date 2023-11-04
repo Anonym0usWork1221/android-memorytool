@@ -45,6 +45,7 @@ please do not hesitate to contact us. Your feedback is invaluable in our pursuit
     1. This documentation is for 0.6 version (UPDATED)
     2. You can find old version on pypi if you want to use them
     3. For Linux and Android Users use 0.6.3 Build other wise you will get PID error
+    4. Fow now please calculate the windows pointer addresses manually this tool does not have feature to calculate pointer for windows yet.
 
 -----------
 
